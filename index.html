@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>graph-toy</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.2.8/build/g6.js"></script>
+    <!-- <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.0/build/g6.js"></script> -->
+
+    <script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #mountNode {
+            width: 100%;
+            height: 100%;
+        }
+
+        #focus-input {
+            outline: none;
+            border: 1px solid rgb(24, 144, 255);
+            position: absolute;
+            width: auto;
+            height: auto;
+        }
+
+        .file-handler {
+            position: fixed;
+            z-index: 999;
+            top: 0;
+        }
+
+        .menu {
+            position: fixed;
+            display: none;
+            z-index: 999;
+            top: 0;
+            background: rgb(219, 233, 240);
+        }
+
+        .menu ul {
+            list-style: none;
+            margin: 5px;
+            padding: 0;
+        }
+
+        .search-bar,
+        .attr-bar,
+        .reader-bar {
+            position: fixed;
+            z-index: 999;
+            top: 24px;
+            padding: 5px;
+            background: rgb(220, 221, 221);
+            max-width: 300px;
+            /* max-height: 200px; */
+        }
+
+        .reader-bar {
+            top: 60px;
+            border: 1px solid rgb(165, 76, 76);
+        }
+
+        .reader-bar .content {
+            max-height: 500px;
+            overflow: auto;
+        }
+
+        .attr-bar {
+            right: 0;
+        }
+
+        .search-bar ul,
+        .attr-bar ul {
+            list-style: none;
+            margin: 5px;
+            padding: 0;
+            max-height: 200px;
+            overflow: auto;
+
+        }
+
+        .search-bar ul li {
+            /*超出部分隐藏*/
+            overflow: hidden;
+            /* 超出部分显示省略号 */
+            text-overflow: ellipsis;
+            /*规定段落中的文本不进行换行 */
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="search-bar">
+            <div v-if="!showSearch" @click="showSearch=true">+</div>
+
+            <div v-else>
+                <div>
+                    <input type="text" v-model="filterKey">
+                    <span style="float: right;" @click="showSearch=false">x</span>
+                </div>
+
+                <ul>
+                    <li v-for="node in listNodes" :title="node.label" :data-id="node.id" @click="focus">{{node.label}}
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+
+        <div class="attr-bar">
+            <div v-if="!showAttr" @click="showAttr=true">+</div>
+
+            <div v-else>
+                <div><span style="float: right;" @click="showAttr=false">x</span></div>
+                <div>
+                    <p v-if="currentType == 'Node'">
+                        currentType:{{currentType}}
+                    </p>
+                    <p v-else>
+                        {{currentEdgeSource}} =={{currentItem.label}}==>
+                        {{currentEdgeTarget}}
+                    </p>
+                    <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
+                    <button type="button" @click="updateItem()">保存</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="reader-bar">
+            <div>
+                <button @click="createSelectedTextNode">选中文字创建节点</button>
+            </div>
+            <div class="content" @mouseup="getSelection">
+                <h2 class="tutheader">设计模式的六大原则</h2>
+                <p><span><strong>1、开闭原则（Open Close Principle）</strong></span></p>
+                <p>开闭原则的意思是：<strong>对扩展开放，对修改关闭</strong>。在程序需要进行拓展的时候，不能去修改原有的代码，实现一个热插拔的效果。简言之，是为了使程序的扩展性好，易于维护和升级。想要达到这样的效果，我们需要使用接口和抽象类，后面的具体设计中我们会提到这点。
+                </p>
+                <p><span><strong>2、里氏代换原则（Liskov Substitution Principle）</strong></span></p>
+                <p>里氏代换原则是面向对象设计的基本原则之一。 里氏代换原则中说，任何基类可以出现的地方，子类一定可以出现。LSP
+                    是继承复用的基石，只有当派生类可以替换掉基类，且软件单位的功能不受到影响时，基类才能真正被复用，而派生类也能够在基类的基础上增加新的行为。里氏代换原则是对开闭原则的补充。实现开闭原则的关键步骤就是抽象化，而基类与子类的继承关系就是抽象化的具体实现，所以里氏代换原则是对实现抽象化的具体步骤的规范。
+                </p>
+                <p><span><strong>3、依赖倒转原则（Dependence Inversion Principle）</strong></span></p>
+                <p>这个原则是开闭原则的基础，具体内容：针对接口编程，依赖于抽象而不依赖于具体。</p>
+                <p><span><strong>4、接口隔离原则（Interface Segregation Principle）</strong></span></p>
+                <p>这个原则的意思是：使用多个隔离的接口，比使用单个接口要好。它还有另外一个意思是：降低类之间的耦合度。由此可见，其实设计模式就是从大型软件架构出发、便于升级和维护的软件设计思想，它强调降低依赖，降低耦合。
+                </p>
+                <p><span><strong>5、迪米特法则，又称最少知道原则（Demeter Principle）</strong></span></p>
+                <p>最少知道原则是指：一个实体应当尽量少地与其他实体之间发生相互作用，使得系统功能模块相对独立。</p>
+                <p><span><strong>6、合成复用原则（Composite Reuse Principle）</strong></span></p>
+                <p>合成复用原则是指：尽量使用合成/聚合的方式，而不是使用继承。</p>
+            </div>
+        </div>
+
+    </div>
+    <div class="file-handler">
+        <button onclick="$('#fileSelect').click()">导入</button>
+        <input type="file" onchange="importData(this)" name="" id="fileSelect" style="width:0px;height:1px;">
+
+        <button onclick="exportData()">导出</button>
+
+
+    </div>
+    <div class="menu">
+        <ul>
+            <li><a href="javascript:;" onclick="rule_selected(this)">选中一级节点</a></li>
+            <li><a href="javascript:;" onclick="relayout(this)">重新布局</a></li>
+        </ul>
+    </div>
+    <div style="position:absolute;width:100%;height:100%;overflow-y: hidden;">
+
+        <div id="mountNode"></div>
+        <div type="text" id="focus-input"></div>
+
+    </div>
+    <script type="text/javascript" language=JavaScript charset="UTF-8">
+        var ControlStatus = false;
+        document.onkeydown = function (event) {
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if (e && e.key == 'Control') { // 按 Esc 
+                //要做的事情
+                ControlStatus = true;
+            }
+        };
+        document.onkeyup = function (event) {
+            var e = event || window.event || arguments.callee.caller.arguments[0];
+            if (e && e.key == 'Control') { // 按 Esc 
+                //要做的事情
+                ControlStatus = false;
+            }
+        }; 
+    </script>
+    <script>
+        //光标最后 cnblogs.com/ybixian/p/10601224.html
+        function keepLastIndex(obj) {
+            // console.log(obj)
+            // console.log(window.getSelection)
+            // console.log(document.selection)
+            if (window.getSelection) { //ie11 10 9 ff safari
+                obj.focus(); //解决ff不获取焦点无法定位问题
+                var range = window.getSelection(); //创建range
+                range.selectAllChildren(obj); //range 选择obj下所有子内容
+                range.collapseToEnd(); //光标移至最后
+            } else if (document.selection) { //ie10 9 8 7 6 5
+                var range = document.selection.createRange(); //创建选择对象
+                //var range = document.body.createTextRange();
+                range.moveToElementText(obj); //range定位到obj
+                range.collapse(false); //光标移至最后
+                range.select();
+            }
+        }
+
+
+        let data = { "nodes": [{ "id": "node1", "realId": "node1", "label": "设计模式", "x": 214.9658422396884, "y": 221.84518870936557, "index": 0, "vy": -0.000419785037246328, "vx": 0.00015216469078658084 }, { "id": "1578917180400130", "realId": "1578917180400130", "label": "对接口编程而不是对实现编程", "x": 247.6357258386712, "y": 75.78402168043746, "index": 1, "vy": -0.00043035250004550295, "vx": 0.00003607174776372558 }, { "id": "1578917184600596", "realId": "1578917184600596", "label": "优先使用对象组合而不是继承", "x": 302.40696000426817, "y": 100.27972272224079, "index": 2, "vy": -0.0004684589106864432, "vx": 0.00007221059017097597 }, { "id": "157891727036066", "realId": "157891727036066", "label": "标准的术语系统", "x": 125.92414536447245, "y": 101.55161539455258, "index": 3, "vy": -0.0002814231973210496, "vx": -0.000005245404689546663 }, { "id": "1578917303880965", "realId": "1578917303880965", "label": "一般问题的最佳解决方案", "x": 65.47296078556997, "y": 212.87090670587207, "index": 4, "vy": 0.00024289966587907901, "vx": 0.0001349379146521375 }, { "id": "1578917348912574", "realId": "1578917348912574", "label": "创建型模式（Creational Patterns）", "x": 343.5588414348191, "y": 143.94176505365786, "index": 5, "vy": -0.0004817818300787123, "vx": 0.0001384327602174318 }, { "id": "157891735518431", "realId": "157891735518431", "label": "结构型模式（Structural Patterns）", "x": 401.80322586562806, "y": 451.3565003604633, "index": 6, "vy": -0.00045131067745247065, "vx": 0.00015303815563441254 }, { "id": "1578917357264931", "realId": "1578917357264931", "label": "行为型模式（Behavioral Patterns）", "x": 89.38833400653095, "y": 303.5146094102858, "index": 7, "vy": 0.0001480299081528974, "vx": 0.0005382770178448653 }, { "id": "1578917414832352", "realId": "1578917414832352", "label": "工厂模式（Factory Pattern）", "x": 491.82168470156614, "y": 123.27456709173887, "index": 8, "vy": 0.0006353153258787534, "vx": 0.00026480372306693844 }, { "id": "1578917426247917", "realId": "1578917426247917", "label": "抽象工厂模式（Abstract Factory Pattern）", "x": 442.55890899783003, "y": 256.4209884144119, "index": 9, "vy": 0.00004974055477296322, "vx": -0.0004622097450878281 }, { "id": "1578917433056713", "realId": "1578917433056713", "label": "单例模式（Singleton Pattern）", "x": 390.79423407867193, "y": 286.759404834658, "index": 10, "vy": -0.00021924277502230049, "vx": -0.0006195253730624692 }, { "id": "1578917440264172", "realId": "1578917440264172", "label": "建造者模式（Builder Pattern）", "x": 331.1670021142153, "y": 293.4348452888833, "index": 11, "vy": -0.0005428805093202818, "vx": -0.000663416185068655 }, { "id": "1578917453375513", "realId": "1578917453375513", "label": "原型模式（Prototype Pattern）", "x": 482.8075576047107, "y": 199.02151914527872, "index": 12, "vy": 0.000654634733073523, "vx": -0.00033576870120090817 }, { "id": "1578917512184374", "realId": "1578917512184374", "label": "适配器模式（Adapter Pattern）", "x": 330.72786780679394, "y": 202.5506171752201, "index": 13, "vy": -0.0003708663344024889, "vx": 0.0002310267642672594 }, { "id": "157891751900849", "realId": "157891751900849", "label": "桥接模式（Bridge Pattern）", "x": 270.7890689495779, "y": 199.85729056507807, "index": 14, "vy": -0.00045909577315954737, "vx": 0.00021415630321250603 }, { "id": "1578917526800994", "realId": "1578917526800994", "label": "过滤器模式（Filter、Criteria Pattern）", "x": 149.4680825792468, "y": 379.03784003940643, "index": 15, "vy": -0.00034656145441930297, "vx": 0.00018166808748062516 }, { "id": "1578917534240632", "realId": "1578917534240632", "label": "组合模式（Composite Pattern）", "x": 171.92669399843362, "y": 263.6475953185492, "index": 16, "vy": -0.0003924338557244156, "vx": 0.00011488748098551506 }, { "id": "157891755247297", "realId": "157891755247297", "label": "装饰器模式（Decorator Pattern）", "x": 445.5392443724995, "y": 337.9280774466434, "index": 17, "vy": -0.0010422453333864435, "vx": 0.00009221426211969792 }, { "id": "1578917574288269", "realId": "1578917574288269", "label": "外观模式（Facade Pattern）", "x": 173.52292809054654, "y": 434.00409219774315, "index": 18, "vy": -0.00035189578692833507, "vx": 0.00023913296076485678 }, { "id": "1578917581856453", "realId": "1578917581856453", "label": "享元模式（Flyweight Pattern）", "x": 148.8733465207705, "y": 319.0420191456038, "index": 19, "vy": -0.00038165829954899135, "vx": 0.00014016196560202363 }, { "id": "1578917588144372", "realId": "1578917588144372", "label": "代理模式（Proxy Pattern）", "x": 385.52221616663496, "y": 226.99362055398979, "index": 20, "vy": -0.00035864418263957, "vx": 0.0002569491989826853 }], "edges": [{ "source": "node1", "target": "1578917180400130", "style": { "lineWidth": 3 }, "startPoint": { "x": 221.73249322546718, "y": 191.59271055572236 }, "endPoint": { "x": 240.86907485289242, "y": 106.03649983408067 } }, { "source": "node1", "target": "1578917184600596", "style": { "lineWidth": 3 }, "startPoint": { "x": 233.06755925947894, "y": 196.67918304824752 }, "endPoint": { "x": 284.3052429844776, "y": 125.44572838335884 } }, { "source": "node1", "target": "157891727036066", "style": { "lineWidth": 3 }, "startPoint": { "x": 196.52243646910173, "y": 196.9285118927937 }, "endPoint": { "x": 144.36755113505913, "y": 126.46829221112445 } }, { "source": "node1", "target": "1578917303880965", "style": { "lineWidth": 3 }, "startPoint": { "x": 184.02155032153385, "y": 219.98755643035184 }, "endPoint": { "x": 96.41725270372453, "y": 214.7285389848858 } }, { "source": "node1", "target": "1578917348912574", "style": { "lineWidth": 3 }, "startPoint": { "x": 241.47987421080586, "y": 205.78262015279398 }, "endPoint": { "x": 317.04480946370165, "y": 160.00433361022945 } }, { "source": "node1", "target": "157891735518431", "style": { "lineWidth": 3 }, "startPoint": { "x": 234.5368843101274, "y": 245.88628502956502 }, "endPoint": { "x": 382.2321837951891, "y": 427.3154040402639 } }, { "source": "node1", "target": "1578917357264931", "style": { "lineWidth": 3 }, "startPoint": { "x": 188.97825545338995, "y": 238.7462340327947 }, "endPoint": { "x": 115.37592079282943, "y": 286.6135640868567 } }, { "source": "1578917348912574", "target": "1578917414832352", "style": { "lineWidth": 3 }, "startPoint": { "x": 374.26197793979077, "y": 139.6618808546315 }, "endPoint": { "x": 461.1185481965945, "y": 127.55445129076523 } }, { "source": "1578917348912574", "target": "1578917426247917", "style": { "lineWidth": 3 }, "startPoint": { "x": 364.04044571074894, "y": 167.2120011135738 }, "endPoint": { "x": 422.0773047219002, "y": 233.15075235449598 } }, { "source": "1578917348912574", "target": "1578917433056713", "style": { "lineWidth": 3 }, "startPoint": { "x": 353.29316005945265, "y": 173.37377213632405 }, "endPoint": { "x": 381.0599154540384, "y": 257.32739775199184 } }, { "source": "1578917348912574", "target": "1578917440264172", "style": { "lineWidth": 3 }, "startPoint": { "x": 340.9979602545435, "y": 174.8358079677944 }, "endPoint": { "x": 333.7278832944909, "y": 262.54080237474676 } }, { "source": "1578917348912574", "target": "1578917453375513", "style": { "lineWidth": 3 }, "startPoint": { "x": 372.38564599112283, "y": 155.34419194764263 }, "endPoint": { "x": 453.980753048407, "y": 187.61909225129395 } }, { "source": "157891735518431", "target": "1578917512184374", "style": { "lineWidth": 3 }, "startPoint": { "x": 393.28820415479464, "y": 421.5488770861391 }, "endPoint": { "x": 339.24288951762736, "y": 232.35824044954433 } }, { "source": "157891735518431", "target": "157891751900849", "style": { "lineWidth": 3 }, "startPoint": { "x": 387.48111043228954, "y": 423.86328284206206 }, "endPoint": { "x": 285.1111843829164, "y": 227.35050808347935 } }, { "source": "157891735518431", "target": "1578917526800994", "style": { "lineWidth": 3 }, "startPoint": { "x": 372.0029471056112, "y": 442.8158103517293 }, "endPoint": { "x": 179.26836133926366, "y": 387.57853004814046 } }, { "source": "157891735518431", "target": "1578917534240632", "style": { "lineWidth": 3 }, "startPoint": { "x": 377.7915224477041, "y": 431.7494072824556 }, "endPoint": { "x": 195.9383974163576, "y": 283.2546883965569 } }, { "source": "157891735518431", "target": "157891755247297", "style": { "lineWidth": 3 }, "startPoint": { "x": 412.95594255915137, "y": 422.43216959285513 }, "endPoint": { "x": 434.3865276789762, "y": 366.85240821425157 } }, { "source": "157891735518431", "target": "1578917574288269", "style": { "lineWidth": 3 }, "startPoint": { "x": 370.892399665915, "y": 449.006857057506 }, "endPoint": { "x": 204.4337542902596, "y": 436.35373550070045 } }, { "source": "157891735518431", "target": "1578917581856453", "style": { "lineWidth": 3 }, "startPoint": { "x": 374.33474766607725, "y": 436.986994265931 }, "endPoint": { "x": 176.34182472032134, "y": 333.4115252401361 } }, { "source": "157891735518431", "target": "1578917588144372", "style": { "lineWidth": 3 }, "startPoint": { "x": 399.5595941064712, "y": 420.43779863271766 }, "endPoint": { "x": 387.76584792579183, "y": 257.91232228173544 } }], "groups": [] };
+
+        data.edges = data.edges.map((edge) => {
+            edge.style.endArrow = true
+            // edge.style.startArrow = true
+            return edge
+        })
+        console.log(JSON.stringify(data.edges));
+
+        //代码参考github.com/antvis/G6/blob/master/src/behavior/drag-node.js
+        // /antvis/G6/blob/master/src/behavior/drag-node-with-group.js
+
+        //在原基础实现节点判断
+        G6.registerBehavior('custom-drag-node', {
+            targetId: null,
+
+            updateEdge: true, //更新边
+            enableDelegate: true, //显示框框
+            delegateStyle: {
+                fill: '#F3F9FF',
+                fillOpacity: 0.5,
+                stroke: '#1890FF',
+                strokeOpacity: 0.9,
+                lineDash: [5, 5]
+            },
+            //原始坐标
+            getEvents() {
+                return {
+                    //dragstart mousedown可能存在bug
+                    'node:dragstart': 'onDragStart',
+                    'node:drag': 'onDrag',
+                    'node:dragend': 'onDragEnd',
+                    mouseenter: 'onMouseEnter',
+                    mouseleave: 'onMouseLeave'
+                };
+            },
+
+            onMouseEnter(e) {
+                if (e.target.get('parent')) {
+                    this.targetId = e.target.get('parent').get('id');
+                    // console.log('onMouseEnter', e.target.get('parent').get('id'))
+                }
+
+            },
+
+            onMouseLeave(e) {
+                if (e.target.get('parent')) {
+
+                    this.targetId = null;
+                    // console.log('onMouseEnter'
+                    //     , e.target.get('parent').get('id')
+                    //     , this.graph.findById(e.target.get('parent').get('id')).getModel()
+
+                    // )
+                }
+
+            },
+            onDragStart(e) {
+
+
+
+                if (!this.shouldBegin.call(this, e)) {
+                    return;
+                }
+
+                const { item, target } = e;
+                const hasLocked = item.hasLocked();
+                if (hasLocked) {
+                    return;
+                }
+
+                // 如果拖动的target 是linkPoints / anchorPoints 则不允许拖动
+                if (target) {
+                    const isAnchorPoint = target.get('isAnchorPoint');
+                    if (isAnchorPoint) {
+                        return;
+                    }
+                }
+
+                const graph = this.graph;
+
+                this.targets = [];
+
+                // 获取所有选中的元素
+                const nodes = graph.findAllByState('node', 'selected');
+
+                const currentNodeId = item.get('id');
+
+                // 当前拖动的节点是否是选中的节点
+                const dragNodes = nodes.filter(node => {
+                    const nodeId = node.get('id');
+                    return currentNodeId === nodeId;
+                });
+
+                // 只拖动当前节点
+                if (dragNodes.length === 0) {
+                    this.target = item;
+                } else {
+                    // 拖动多个节点
+                    if (nodes.length > 1) {
+                        nodes.forEach(node => {
+                            const hasLocked = node.hasLocked();
+                            if (!hasLocked) {
+                                this.targets.push(node);
+                            }
+                        });
+                    } else {
+                        this.targets.push(item);
+                    }
+                }
+
+                this.origin = {
+                    x: e.x,
+                    y: e.y
+                };
+
+                this.point = {};
+                this.originPoint = {};
+            },
+            onDrag(e) {
+
+                // if (e) {
+
+                //     console.log(this.targetId)
+                // }
+                e.target.set('capture', false);
+
+
+                if (!this.origin) {
+                    return;
+                }
+                if (!this.get('shouldUpdate').call(this, e)) {
+                    return;
+                }
+                const graph = this.graph;
+                const autoPaint = graph.get('autoPaint');
+                graph.setAutoPaint(false);
+
+
+                // 当targets中元素时，则说明拖动的是多个选中的元素
+                if (this.targets.length > 0) {
+                    if (this.enableDelegate) {
+                        this._updateDelegate(e);
+                    } else {
+                        this.targets.forEach(target => {
+                            this._update(target, e, this.enableDelegate);
+                        });
+                    }
+                } else {
+                    // 只拖动单个元素
+                    this._update(this.target, e, this.enableDelegate);
+                }
+
+                graph.paint();
+                graph.setAutoPaint(autoPaint);
+            },
+            onDragEnd(e) {
+
+                // console.log(this.targetId, this.targetId && this.graph.findById(this.targetId).getModel());
+                if (!this.origin || !this.shouldEnd.call(this, e)) {
+                    return;
+                }
+
+
+                const graph = this.graph;
+                const autoPaint = graph.get('autoPaint');
+                graph.setAutoPaint(false);
+
+                if (this.shape) {
+                    this.shape.remove();
+                    this.shape = null;
+                }
+
+                if (this.target) {
+                    const delegateShape = this.target.get('delegateShape');
+                    if (delegateShape) {
+                        delegateShape.remove();
+                        this.target.set('delegateShape', null);
+                    }
+                }
+
+
+
+                //上面代码是用来改变位置的
+                //如果是建立关联，我们是不需要改变位置的
+
+
+                if (this.targetId) {
+                    // console.log(this.targets)
+
+
+
+
+                    if (this.targets.length > 0) {
+
+
+                        //如果目标ID是已经选择的目标则放弃此次操作
+                        if (!this.targets.find(node => node.getModel().id == this.targetId)) {
+                            this.targets.forEach(node => {
+                                graph.addItem('edge', {
+                                    source: node.getModel().id,
+                                    target: this.targetId
+                                })
+                            });
+                        }
+
+
+
+
+                    } else if (this.target) {
+
+                        graph.addItem('edge', {
+                            source: this.target.getModel().id,
+                            target: this.targetId
+                        })
+                    }
+
+
+                } else {
+
+                    if (this.targets.length > 0) {
+                        // 获取所有已经选中的节点
+                        this.targets.forEach(node => this._update(node, e));
+                    } else if (this.target) {
+                        this._update(this.target, e);
+                    }
+                }
+
+
+
+                this.point = {};
+                this.origin = null;
+                this.originPoint = {};
+                this.targets.length = 0;
+                this.target = null;
+
+                // 终止时需要判断此时是否在监听画布外的 mouseup 事件，若有则解绑
+                const fn = this.fn;
+                if (fn) {
+                    body.removeEventListener('mouseup', fn, false);
+                    this.fn = null;
+                }
+
+                graph.paint();
+                graph.setAutoPaint(autoPaint);
+            },
+            _update(item, e, force) {
+                const origin = this.origin;
+                const model = item.get('model');
+                const nodeId = item.get('id');
+                if (!this.point[nodeId]) {
+                    this.point[nodeId] = {
+                        x: model.x,
+                        y: model.y
+                    };
+                }
+
+                const x = e.x - origin.x + this.point[nodeId].x;
+                const y = e.y - origin.y + this.point[nodeId].y;
+
+                // 拖动单个未选中元素
+                if (force) {
+                    this._updateDelegate(e, x, y);
+                    return;
+                }
+
+                const pos = { x, y };
+
+                if (this.get('updateEdge')) {
+                    this.graph.updateItem(item, pos);
+                } else {
+                    item.updatePosition(pos);
+                    // this.graph.paint();
+                }
+            },
+            /**
+             * 更新拖动元素时的delegate
+             * @param {Event} e 事件句柄
+             * @param {number} x 拖动单个元素时候的x坐标
+             * @param {number} y 拖动单个元素时候的y坐标
+             */
+            _updateDelegate(e, x, y) {
+                const bbox = e.item.get('keyShape').getBBox();
+                if (!this.shape) {
+                    // 拖动多个
+                    const parent = this.graph.get('group');
+                    const attrs = Object.assign({}, this.delegateStyle);
+                    if (this.targets.length > 0) {
+                        const { x, y, width, height, minX, minY } = this.calculationGroupPosition();
+                        this.originPoint = { x, y, width, height, minX, minY };
+                        // model上的x, y是相对于图形中心的，delegateShape是g实例，x,y是绝对坐标
+                        this.shape = parent.addShape('rect', {
+                            attrs: {
+                                width,
+                                height,
+                                x,
+                                y,
+                                ...attrs
+                            }
+                        });
+                    } else if (this.target) {
+                        this.shape = parent.addShape('rect', {
+                            attrs: {
+                                width: bbox.width,
+                                height: bbox.height,
+                                x: x + bbox.x,
+                                y: y + bbox.y,
+                                ...attrs
+                            }
+                        });
+                        this.target.set('delegateShape', this.shape);
+                    }
+                    this.shape.set('capture', false);
+                } else {
+                    if (this.targets.length > 0) {
+                        const clientX = e.x - this.origin.x + this.originPoint.minX;
+                        const clientY = e.y - this.origin.y + this.originPoint.minY;
+                        this.shape.attr({
+                            x: clientX,
+                            y: clientY
+                        });
+                    } else if (this.target) {
+                        this.shape.attr({
+                            x: x + bbox.x,
+                            y: y + bbox.y
+                        });
+                    }
+                }
+
+                // this.graph.paint();
+            },
+            /**
+            * 计算delegate位置，包括左上角左边及宽度和高度
+            * @memberof ItemGroup
+            * @return {object} 计算出来的delegate坐标信息及宽高
+            */
+            calculationGroupPosition() {
+                const graph = this.graph;
+
+                const nodes = graph.findAllByState('node', 'selected');
+
+                let minx = Infinity;
+                let maxx = -Infinity;
+                let miny = Infinity;
+                let maxy = -Infinity;
+
+                // 获取已节点的所有最大最小x y值
+                for (const id of nodes) {
+                    // console.log("------------",id, typeof id);
+                    const element = typeof id === 'string' ? graph.findById(id) : id;
+                    const bbox = element.getBBox();
+                    const { minX, minY, maxX, maxY } = bbox;
+                    if (minX < minx) {
+                        minx = minX;
+                    }
+
+                    if (minY < miny) {
+                        miny = minY;
+                    }
+
+                    if (maxX > maxx) {
+                        maxx = maxX;
+                    }
+
+                    if (maxY > maxy) {
+                        maxy = maxY;
+                    }
+                }
+                const x = Math.floor(minx) - 20;
+                const y = Math.floor(miny) + 10;
+                const width = Math.ceil(maxx) - x;
+                const height = Math.ceil(maxy) - y;
+
+                return {
+                    x,
+                    y,
+                    width,
+                    height,
+                    minX: minx,
+                    minY: miny
+                };
+            }
+        });
+
+
+        var count = 0;
+
+        G6.registerBehavior('nodeClick', {
+            getEvents() {
+                return {
+                    'node:click': 'onClick',
+                };
+            },
+            onClick(e) {
+                e.preventDefault();
+                if (!this.shouldUpdate.call(this, e)) {
+                    return;
+                }
+                const { item } = e;
+                const graph = this.graph;
+
+                // console.log(e);
+
+
+                if (!ControlStatus) {
+                    //关闭多选
+                    const selectedNodes = graph.findAllByState('node', 'selected');
+                    selectedNodes.forEach(cn => {
+                        graph.setItemState(cn, 'selected', false);
+                    });
+                }
+
+                graph.setItemState(item, 'selected', true);
+
+                app.currentType = "Node";
+                app.currentItem = item.getModel();
+            },
+        });
+
+        G6.registerBehavior('edgeClick', {
+            getEvents() {
+                return {
+                    'edge:click': 'onClick',
+                };
+            },
+            onClick(e) {
+                e.preventDefault();
+                if (!this.shouldUpdate.call(this, e)) {
+                    return;
+                }
+                const { item } = e;
+                const graph = this.graph;
+
+                console.log(e, item);
+
+
+                // if (!ControlStatus) {
+                //     //关闭多选
+                //     const selectedNodes = graph.findAllByState('node', 'selected');
+                //     selectedNodes.forEach(cn => {
+                //         graph.setItemState(cn, 'selected', false);
+                //     });
+                // }
+
+                // graph.setItemState(item, 'selected', true);
+            },
+        });
+
+        //双击空白新建节点
+        G6.registerBehavior('node-dblclick-edit', {
+            getEvents() {
+                return {
+                    'node:dblclick': 'onDblClick',
+                };
+            },
+            onDblClick(e) {
+                e.preventDefault();
+                if (!this.shouldUpdate.call(this, e)) {
+                    return;
+                }
+                const { item } = e;
+                window.a = item;
+                const graph = this.graph;
+
+                const model = item.getModel();
+
+
+
+
+
+
+                const zoom = graph.getZoom();
+
+                //下面代码参考 github.com/alibaba/GGEditor/tree/master/src/plugins/EditableLabel
+
+
+                const group = item.getContainer();
+                const labelShape = group.findByClassName('node-label');
+
+                const { x: relativeX, y: relativeY } = labelShape.getBBox();
+                const { x: absoluteX, y: absoluteY } = G6.Util.applyMatrix(
+                    {
+                        x: relativeX,
+                        y: relativeY,
+                    },
+                    item.getContainer().getMatrix(),
+                );
+
+                const { x: left, y: top } = graph.getCanvasByPoint(absoluteX, absoluteY);
+                const { width, height } = labelShape.getBBox();
+
+
+                $(`#focus-input`)
+                    .css('left', left)
+                    .css('top', top)
+                    .css('minWidth', width)
+                    .css('minHeight', height)
+                    .css('background', '#fff')
+                    .css('font-size', labelShape.attr('fontStyle'))
+                    .css('font-variant', labelShape.attr('fontVariant'))
+                    .css('font-weight', labelShape.attr('fontWeight'))
+                    .css('font-size', labelShape.attr('fontSize'))
+                    .css('font-family', labelShape.attr('fontFamily'))
+                    .css('transform', `scale(${zoom})`)
+                    .css('transformOrigin', 'left top')
+                    .html(model.label)
+                    .attr('contenteditable', 'true')
+                    .show()
+                    .focus()
+                    .on("input", function () {
+                        //记录长度变化
+                    })
+                    .on("blur", function () {
+                        //失去焦点事件
+
+                        // console.log(model.realId);
+                        const findNodes = graph.findAll('node', node => {
+                            return node.get('model').realId === model.realId;
+                        });
+
+                        findNodes.forEach(node => {
+                            graph.updateItem(node, {
+                                label: $(this).text(),
+                                // size: [$(this).width() + 40, $(this).height() + 20]
+                            })
+                        });
+
+
+
+                        $(this).hide().unbind();
+                    });
+                keepLastIndex($(`#focus-input`)[0]);
+
+            },
+        });
+
+
+
+
+        const graph = new G6.Graph({
+            container: 'mountNode',  // String | HTMLElement，必须，容器 id 或容器本身
+            width: Math.floor($('#mountNode').width()),              // Number，必须，图的宽度
+            height: Math.floor($('#mountNode').height()),             // Number，必须，图的高度
+            // renderer: "svg",
+            modes: {
+                default: ['edgeClick', 'brush-select', 'custom-drag-node', 'node-dblclick-edit', 'nodeClick', 'drag-canvas', 'zoom-canvas']
+            },
+            defaultEdge: {
+                style: {
+                    endArrow: true,
+                    lineWidth: 3
+                }
+            },
+            nodeStateStyles: {
+                selected: {
+                    // hover 状态为 true 时的样式
+                    fill: '#d3adf7',
+                },
+            },
+            // layout: {
+            //     type: 'force',            // 设置布局算法为 force
+            //     linkDistance: 150,        // 设置边长为 100
+            //     preventOverlap: true,     // 设置防止重叠
+            //     nodeSize: 60,
+            //     nodeStrength: 10,
+            //     edgeStrength: 3,
+            // },  
+
+            // 边在各状态下的样式
+            edgeStateStyles: {
+                hover: {
+                    stroke: '#f00'
+                },
+                // click 状态为 true 时的样式
+                selected: {
+                    stroke: '#f00'
+                }
+            },
+
+            animate: true            // Boolean，可选，切换布局时是否使用动画过度
+        });
+
+        // 监听鼠标进入节点
+        graph.on('node:mouseenter', e => {
+            const nodeItem = e.item;
+            // 设置目标节点的 hover 状态 为 true
+            graph.setItemState(nodeItem, 'hover', true);
+        });
+        // 监听鼠标离开节点
+        graph.on('node:mouseleave', e => {
+            const nodeItem = e.item;
+            // 设置目标节点的 hover 状态 false
+            graph.setItemState(nodeItem, 'hover', false);
+        });
+        // 监听鼠标进入节点
+        graph.on('edge:mouseenter', e => {
+            const nodeItem = e.item;
+            // 设置目标节点的 hover 状态 为 true
+            graph.setItemState(nodeItem, 'hover', true);
+        });
+        // 监听鼠标离开节点
+        graph.on('edge:mouseleave', e => {
+            const nodeItem = e.item;
+            // 设置目标节点的 hover 状态 false
+            graph.setItemState(nodeItem, 'hover', false);
+        });
+
+        // 监听鼠标点击边
+        graph.on('edge:click', e => {
+            // 先将所有当前有 click 状态的边的 click 状态置为 false
+            const clickEdges = graph.findAllByState('edge', 'selected');
+            clickEdges.forEach(ce => {
+                graph.setItemState(ce, 'selected', false);
+            });
+            const edgeItem = e.item;
+            // 设置目标边的 click 状态 为 true
+            graph.setItemState(edgeItem, 'selected', true);
+
+
+            app.currentType = "Edge";
+            app.currentItem = edgeItem.getModel();
+        });
+
+        //参考antv-2018.alipay.com/zh-cn/g6/3.x/demo/tool/context-menu.html
+        graph.on('node:contextmenu', function (evt) {
+            console.log();
+            $('.menu').css('left', evt.clientX).css('top', evt.clientY).show();
+
+
+            //设置ID 便于后续操作
+            $('.menu a').data('id', evt.item.getModel().id);
+        });
+
+        graph.on('node:mouseleave', function (evt) {
+            $('.menu').hide();
+        });
+
+        graph.on('keydown', function (e) {
+
+
+            if (e.key !== "Tab") {
+                if (e.key == "Delete") {
+                    var edges = graph.findAllByState('edge', 'selected');
+                    edges.forEach(edge => graph.removeItem(edge));
+
+                    var items = graph.findAllByState('node', 'selected');
+                    items.forEach(node => graph.removeItem(node));
+
+                    return;
+                }
+                return;
+            }
+
+            //判断是否为tab键
+
+            //获取选择的节点
+            const nodes = graph.findAllByState('node', 'selected');
+
+            if (nodes.length) {
+                var addNode = () => {
+                    var id = new Date().getTime() + parseInt(Math.random() * 1000).toString();
+
+
+                    //因为需要手动指定x,y 无法调用布局方法
+
+                    graph.addItem('node', {
+                        id: id,
+                        realId: id,
+                        label: '新节点',
+                        x: nodes[0].getModel().x + 100,
+                        y: nodes[0].getModel().y
+                    })
+                    //该方式加入的节点必须要传入x/y ，并且调用graph.layout()并不会重新布局
+
+                    return id;
+                }
+
+                var id = addNode();
+
+                graph.addItem('edge', {
+                    source: nodes[0].getModel().id,
+                    target: id
+                });
+
+
+
+
+
+            }
+
+        })
+
+
+
+        // 读取数据和渲染
+        graph.data(data);
+        graph.render();
+
+
+
+
+
+    </script>
+
+    <script>
+
+        var download = function (filename, data) {
+            var file = "data:text/plain;charset=utf-8,";
+            var encoded = encodeURIComponent(data);
+            file += encoded;
+            var a = document.createElement('a');
+            a.href = file;
+            a.target = '_blank';
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        var exportData = function () {
+
+            var data = graph.save()
+
+            var filename = "graph-toy.export.json";
+            if (data.nodes.length > 0) {
+                filename = data.nodes[0].label + ".export.json";
+            }
+
+            download(filename, JSON.stringify(data));
+        }
+
+        var importData = function (el) {
+
+            var file = el.files[0];
+
+            console.log(file.type);
+            if (!/application\/json/.test(file.type)) {
+                alert("文件格式错误！");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = function (e) {
+                //更新数据
+                graph.changeData(JSON.parse(this.result));
+            }
+        }
+
+        function relayout(el) {
+            var currentNodeId = $(el).data('id');
+            var node = graph.findById(currentNodeId);
+            // console.log();
+            subLayout(node.getModel());
+        }
+        // 参考g6.antv.vision/zh/examples/net/layoutMechanism#subgraphLayout
+        // yuque.com/antv/g6/qopkkg#eYZc6
+        function subLayout(centerNode) {
+
+            const data = graph.save(); //最新数据
+
+
+
+
+            const nodes = data.nodes;
+            const edges = data.edges;
+
+            const newNodes = []; //被用来参加子图布局计算的节点
+            const newEdges = [];
+            const newNodeMap = new Map(); //
+
+            //这句不懂 暂时保留
+            // fix the nodes[0]
+            // nodes[0].fx = nodes[0].x;
+            // nodes[0].fy = nodes[0].y;
+
+
+            //获取选择中的节点
+
+            console.log()
+
+            graph.findAllByState('node', 'selected').forEach(function (node, i) {
+                var nodeModel = node.getModel();
+                // nodeModel.fx = nodeModel.x;
+                // nodeModel.fy = nodeModel.y;
+
+                // nodeModel.x = null;
+                // nodeModel.y = null;
+                newNodes.push(nodeModel);
+                newNodeMap.set(node.getModel().id, i);
+            });
+
+
+            // add the nodes which should be re-layout
+            // nodes
+
+
+
+            console.log(newNodes, newNodeMap);
+
+            // add related edges
+            // 只要有关系都带进来
+            edges.forEach(function (edge) {
+                const sourceId = edge.source;
+                const targetId = edge.target;
+                if (newNodeMap.get(sourceId) !== undefined && newNodeMap.get(targetId) !== undefined) {
+                    newEdges.push(edge);
+                }
+            });
+
+            const subForceLayout = new G6.Layout.force({
+                center: [centerNode.x, centerNode.y],
+                linkDistance: 120,
+                preventOverlap: true,
+                // nodeSize: 20,
+                tick: function tick() {
+                    // the tick function to show the animation of layout process
+                    graph.refreshPositions();
+                }
+            });
+
+            //下面布局算法需要手动调用graph.refreshPositions();
+
+            // const subForceLayout = new G6.Layout.radial({
+            //     center: [centerNode.x,centerNode.y],
+            //     unitRadius: 120,
+            //     preventOverlap:false,
+            //     nodeSize:200,
+            //     nodeSpacing:50,
+
+            // });
+
+
+            // dagre算法没有中心节点参数指定
+            // const subForceLayout = new G6.Layout.dagre({
+            //     nodeSize: [40, 20],
+            //     nodesep: 1,
+            //     ranksep: 1
+            // });
+
+
+
+
+            subForceLayout.init({
+                nodes: newNodes,
+                edges: newEdges
+            });
+            subForceLayout.execute();
+
+        }
+
+
+        rule_selected = function (el) {
+            var currentNodeId = $(el).data('id');
+
+            //选择该节点的指向节点
+            graph.getEdges().forEach(edge => {
+                const sourceId = edge.getModel().source;
+                const targetId = edge.getModel().target;
+
+                if (sourceId === currentNodeId) {
+                    graph.setItemState(targetId, 'selected', true);
+                }
+            })
+        }
+    </script>
+
+    <script>
+        //代码参考cn.vuejs.org/v2/examples/grid-component.html
+        var app = new Vue({
+            el: '#app',
+            computed: {
+                currentEdgeSource: function () {
+                    if (this.currentType == "Edge") {
+                        return graph.findById(this.currentItem.source).getModel().label
+                    }
+                },
+                currentEdgeTarget() {
+                    if (this.currentType == "Edge") {
+                        return graph.findById(this.currentItem.target).getModel().label
+                    }
+                },
+                listNodes: function () {
+                    // var sortKey = this.sortKey
+                    var filterKey = this.filterKey && this.filterKey.toLowerCase()
+                    // var order = this.sortOrders[sortKey] || 1
+                    var nodes = this.nodes
+                    if (filterKey) {
+                        nodes = nodes.filter(function (row) {
+                            return Object.keys(row).some(function (key) {
+                                return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+                            })
+                        })
+                    }
+                    // if (sortKey) {
+                    //     nodes = nodes.slice().sort(function (a, b) {
+                    //         a = a[sortKey]
+                    //         b = b[sortKey]
+                    //         return (a === b ? 0 : a > b ? 1 : -1) * order
+                    //     })
+                    // }
+                    return nodes
+                },
+
+            },
+            methods: {
+                updateItem: function () {
+
+                    if (this.currentType == "Node") {
+
+                        var item = graph.findById(this.currentItem.id);
+                        item.update({
+                            // id: this.currentItem.id,
+                            label: this.currentItem.label
+                        });
+
+                        graph.refreshItem(item)
+                    } else {
+                        var item = graph.findById(this.currentItem.source);
+                        const edges = item.getOutEdges()
+
+                        edges.forEach(edge => {
+                            if (edge.getModel().target == this.currentItem.target) {
+                                edge.update({
+                                    // id: this.currentItem.id,
+                                    label: this.currentItem.label
+                                });
+
+                                graph.refreshItem(edge)
+                            }
+
+                        })
+
+                    }
+
+                },
+                getSelection() {
+
+
+
+
+                },
+                createSelectedTextNode: function () {
+                    const nodes = graph.findAllByState('node', 'selected');
+                    var id = new Date().getTime() + parseInt(Math.random() * 1000).toString();
+
+                    //因为需要手动指定x,y 无法调用布局方法
+                    var x = 0, y = 0;
+                    if (nodes.length) {
+                        x = nodes[0].getModel().x + 100;
+                        y = nodes[0].getModel().y;
+                    }
+                    graph.addItem('node', {
+                        id: id,
+                        realId: id,
+                        label: window.getSelection().toString(),
+                        x: x,
+                        y: y
+                    })
+
+                    if (nodes.length) {
+                        graph.addItem('edge', {
+                            source: nodes[0].getModel().id,
+                            target: id
+                        });
+                    }
+
+                    // 使用changeData也许要传递xy,如果不传递调用2次后
+                    //检测到有节点没有x\y 会导致重新布局 已有位置信息全部丢失
+
+                },
+                focus: function (e) {
+
+                    //参考g6.antv.vision/zh/examples/interaction/position
+                    var { id } = e.target.dataset;
+
+                    var item = graph.findById(id);
+
+                    const selectedNodes = graph.findAllByState('node', 'selected');
+                    selectedNodes.forEach(cn => {
+                        graph.setItemState(cn, 'selected', false);
+                    });
+
+
+                    graph.setItemState(item, 'selected', true);
+
+                    this.currentType = "Node";
+                    this.currentItem = item.getModel();
+                    // const item = event.item;
+                    // 聚焦当前点击的节点（把节点放到视口中心）
+
+                    const matrix = item.get('group').getMatrix();
+                    const point = {
+                        x: matrix[6],
+                        y: matrix[7]
+                    };
+                    const width = graph.get('width');
+                    const height = graph.get('height');
+                    // 找到视口中心
+                    const viewCenter = {
+                        x: width / 2,
+                        y: height / 2
+                    };
+                    const modelCenter = graph.getPointByCanvas(viewCenter.x, viewCenter.y);
+                    const viewportMatrix = graph.get('group').getMatrix();
+                    // 画布平移的目标位置，最终目标是graph.translate(dx, dy);
+                    const dx = (modelCenter.x - point.x) * viewportMatrix[0];
+                    const dy = (modelCenter.y - point.y) * viewportMatrix[4];
+                    let lastX = 0;
+                    let lastY = 0;
+                    let newX = void 0;
+                    let newY = void 0;
+                    // 动画每次平移一点，直到目标位置
+                    graph.get('canvas').animate({
+                        onFrame: function onFrame(ratio) {
+                            newX = dx * ratio;
+                            newY = dy * ratio;
+                            graph.translate(newX - lastX, newY - lastY);
+                            lastX = newX;
+                            lastY = newY;
+                        }
+                    }, 300, 'easeCubic');
+
+                    console.log(this, id)
+                }
+            },
+            data: {
+                currentType: '', //Node、Edge
+                currentItem: {},
+
+                showSearch: true,
+                showAttr: true,
+                filterKey: "",
+                nodes: graph.save().nodes,
+            }
+        })
+    </script>
+</body>
+
+</html>
