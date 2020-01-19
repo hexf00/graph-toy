@@ -14,7 +14,9 @@
 -- 导出  表 graph-toy.oplogs 结构
 DROP TABLE IF EXISTS `oplogs`;
 CREATE TABLE IF NOT EXISTS `oplogs` (
-  `id` int(11) DEFAULT NULL
+  `id` int(11) DEFAULT NULL,
+  `content` varchar(50) DEFAULT NULL COMMENT '操作内容',
+  `time` datetime DEFAULT NULL COMMENT '操作内容'
 ) ENGINE=MyISAM DEFAULT CHARSET=gbk;
 
 -- 数据导出被取消选择。
