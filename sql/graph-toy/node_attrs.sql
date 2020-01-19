@@ -15,7 +15,8 @@
 DROP TABLE IF EXISTS `node_attrs`;
 CREATE TABLE IF NOT EXISTS `node_attrs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(50) NOT NULL DEFAULT '' COMMENT '属性名称/关系边',
+  `value` varchar(50) NOT NULL DEFAULT '' COMMENT '属性值/新节点',
   `node_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=gbk COMMENT='节点属性';
