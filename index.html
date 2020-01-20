@@ -15,6 +15,11 @@
     
     <script src="res/mark.js"></script>
     <script src="res/scheduler.js"></script>
+    <script src="res/export.js"></script>
+    <script src="res/import.js"></script>
+
+    
+    <!-- G6 behavior -->
     <script src="res/node-click.js"></script>
     <script src="res/custom-drag-node.js"></script>
     <script src="res/node-dblclick-edit.js"></script>
@@ -452,47 +457,6 @@
 
     <script>
 
-        var download = function (filename, data) {
-            var file = "data:text/plain;charset=utf-8,";
-            var encoded = encodeURIComponent(data);
-            file += encoded;
-            var a = document.createElement('a');
-            a.href = file;
-            a.target = '_blank';
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        }
-
-        var exportData = function () {
-
-            var data = graph.save()
-
-            var filename = "graph-toy.export.json";
-            if (data.nodes.length > 0) {
-                filename = data.nodes[0].label + ".export.json";
-            }
-
-            download(filename, JSON.stringify(data));
-        }
-
-        var importData = function (el) {
-
-            var file = el.files[0];
-
-            console.log(file.type);
-            if (!/application\/json/.test(file.type)) {
-                alert("文件格式错误！");
-                return false;
-            }
-            var reader = new FileReader();
-            reader.readAsText(file);
-            reader.onload = function (e) {
-                //更新数据
-                graph.changeData(JSON.parse(this.result));
-            }
-        }
 
         function relayout(el) {
             var currentNodeId = $(el).data('id');
