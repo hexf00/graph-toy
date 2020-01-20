@@ -63,6 +63,9 @@
             max-width: 300px;
             /* max-height: 200px; */
         }
+        .reader-bar{
+            display: none;
+        }
 
         .reader-bar {
             top: 60px;
@@ -138,6 +141,7 @@
                         {{currentEdgeTarget}}
                     </p>
                     <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
+                    <p  v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category" name="category"></p>
                     <button type="button" @click="updateItem()">保存</button>
                 </div>
             </div>
@@ -1140,6 +1144,7 @@
                         var item = graph.findById(this.currentItem.id);
                         item.update({
                             // id: this.currentItem.id,
+                            category:this.currentItem.category,
                             label: this.currentItem.label
                         });
 
