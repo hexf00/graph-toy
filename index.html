@@ -12,13 +12,13 @@
 
     <script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
 
-    
+
     <script src="res/mark.js"></script>
     <script src="res/scheduler.js"></script>
     <script src="res/export.js"></script>
     <script src="res/import.js"></script>
 
-    
+
     <!-- G6 behavior -->
     <script src="res/node-click.js"></script>
     <script src="res/custom-drag-node.js"></script>
@@ -76,7 +76,8 @@
             max-width: 300px;
             /* max-height: 200px; */
         }
-        .reader-bar{
+
+        .reader-bar {
             display: none;
         }
 
@@ -113,7 +114,7 @@
             white-space: nowrap;
         }
 
-        .highlight{
+        .highlight {
             font-weight: bold;
             color: rgb(255, 255, 60);
         }
@@ -132,7 +133,8 @@
                 </div>
 
                 <ul>
-                    <li v-for="node in listNodes" :title="node.label" :data-id="node.id" @click="focus($event.target)">{{node.label}}
+                    <li v-for="node in listNodes" :title="node.label" :data-id="node.id" @click="focus($event.target)">
+                        {{node.label}}
                     </li>
                 </ul>
             </div>
@@ -154,7 +156,8 @@
                         {{currentEdgeTarget}}
                     </p>
                     <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
-                    <p  v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category" name="category"></p>
+                    <p v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category"
+                            name="category"></p>
                     <button type="button" @click="updateItem()">保存</button>
                 </div>
             </div>
@@ -254,7 +257,7 @@
         })
         console.log(JSON.stringify(data.edges));
 
-    
+
 
         G6.registerBehavior('edgeClick', {
             getEvents() {
@@ -285,7 +288,7 @@
             },
         });
 
-    
+
 
 
 
@@ -388,71 +391,20 @@
             $('.menu').hide();
         });
 
-        graph.on('keydown', function (e) {
-
-
-            if (e.key !== "Tab") {
-                if (e.key == "Delete") {
-                    var edges = graph.findAllByState('edge', 'selected');
-                    edges.forEach(edge => graph.removeItem(edge));
-
-                    var items = graph.findAllByState('node', 'selected');
-                    items.forEach(node => graph.removeItem(node));
-
-                    return;
-                }
-                return;
-            }
-
-            //判断是否为tab键
-
-            //获取选择的节点
-            const nodes = graph.findAllByState('node', 'selected');
-
-            if (nodes.length) {
-                var addNode = () => {
-                    var id = new Date().getTime() + parseInt(Math.random() * 1000).toString();
-
-
-                    //因为需要手动指定x,y 无法调用布局方法
-
-                    graph.addItem('node', {
-                        id: id,
-                        realId: id,
-                        label: '新节点',
-                        x: nodes[0].getModel().x + 100,
-                        y: nodes[0].getModel().y
-                    })
-                    //该方式加入的节点必须要传入x/y ，并且调用graph.layout()并不会重新布局
-
-                    return id;
-                }
-
-                var id = addNode();
-
-                graph.addItem('edge', {
-                    source: nodes[0].getModel().id,
-                    target: id
-                });
-
-
-
-
-
-            }
-
-        })
-
-
-
         // 读取数据和渲染
         graph.data(data);
         graph.render();
 
+        var graphUpdate = _.throttle(function (event, args) {
+            app.$set(app.graphData, 'nodes', graph.save().nodes);
+        }, 100, {
+            leading: false,
+            trailing: true //节流结束后执行
+        })
 
-
-
-
+        graph.on("afteradditem", function () { graphUpdate.call(this, 'afteradditem', arguments) })
+        graph.on("afterremoveitem", function () { graphUpdate.call(this, 'afterremoveitem', arguments) })
+        graph.on("afterupdateitem", function () { graphUpdate.call(this, 'afterupdateitem', arguments) })
     </script>
 
     <script>
@@ -592,10 +544,11 @@
                     }
                 },
                 listNodes: function () {
+                    console.log("listNodes 更新", JSON.stringify(this.graphData.nodes))
                     // var sortKey = this.sortKey
                     var filterKey = this.filterKey && this.filterKey.toLowerCase()
                     // var order = this.sortOrders[sortKey] || 1
-                    var nodes = this.nodes
+                    var nodes = this.graphData.nodes
                     if (filterKey) {
                         nodes = nodes.filter(function (row) {
                             return Object.keys(row).some(function (key) {
@@ -622,7 +575,7 @@
                         var item = graph.findById(this.currentItem.id);
                         item.update({
                             // id: this.currentItem.id,
-                            category:this.currentItem.category,
+                            category: this.currentItem.category,
                             label: this.currentItem.label
                         });
 
@@ -691,7 +644,7 @@
 
                 },
                 focus: function (target) {
-                    console.log(target,this);
+                    console.log(target, this);
 
                     //参考g6.antv.vision/zh/examples/interaction/position
                     var { id } = target.dataset;
@@ -753,7 +706,8 @@
                 showSearch: true,
                 showAttr: true,
                 filterKey: "",
-                nodes: graph.save().nodes,
+                graphData: graph.save(),
+                // nodes: graph.save().nodes,
             }
         })
     </script>
