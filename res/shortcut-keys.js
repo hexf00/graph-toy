@@ -8,6 +8,10 @@ G6.registerBehavior('shortcut-keys', {
         };
     },
     keydown(e) {
+        if (document.activeElement.getAttribute("type") == "text") {
+            return;
+        }
+        
         e.preventDefault();
         if (!this.shouldUpdate.call(this, e)) {
             return;
