@@ -160,7 +160,8 @@
                             name="category"></p>
                     <div>
                         <div>描述:</div>
-                        <textarea style="width: 98%;min-height: 80px;" type="text" v-model="currentItem.description" name="description"></textarea>
+                        <textarea style="width: 98%;min-height: 80px;" type="text" v-model="currentItem.description"
+                            name="description"></textarea>
                     </div>
                     <button type="button" @click="updateItem()">保存</button>
                 </div>
@@ -579,6 +580,7 @@
                         var item = graph.findById(this.currentItem.id);
                         item.update({
                             // id: this.currentItem.id,
+                            description: this.currentItem.description,
                             category: this.currentItem.category,
                             label: this.currentItem.label
                         });
@@ -592,6 +594,7 @@
                             if (edge.getModel().target == this.currentItem.target) {
                                 edge.update({
                                     // id: this.currentItem.id,
+                                    description: this.currentItem.description,
                                     label: this.currentItem.label
                                 });
 
