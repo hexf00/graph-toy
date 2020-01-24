@@ -65,9 +65,9 @@
             padding: 0;
         }
 
-        .search-bar,
         .attr-bar,
-        .reader-bar {
+        .reader-bar,
+        .left-bar {
             position: fixed;
             z-index: 999;
             top: 24px;
@@ -118,28 +118,61 @@
             font-weight: bold;
             color: rgb(255, 255, 60);
         }
+
+        ul.tab-title {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul.tab-title li {
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        ul.tab-title li.active {
+            font-weight: bold;
+        }
     </style>
+
+
 </head>
 
 <body>
     <div id="app">
-        <div class="search-bar">
-            <div v-if="!showSearch" @click="showSearch=true">+</div>
 
-            <div v-else>
-                <div>
-                    <input type="text" v-model="filterKey">
-                    <span style="float: right;" @click="showSearch=false">x</span>
+        <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
+        <div v-else class="tab left-bar">
+            <ul class="tab-title">
+                <li :class="{active: activeTabIndex == 0}" @click="activeTab(0)">节点</li>
+                /
+                <li :class="{active: activeTabIndex == 1}" @click="activeTab(1)">类型</li>
+                <span style="float: right;" @click="showSearch=false">x</span>
+            </ul>
+            <div class="tab-content">
+                <div v-show="activeTabIndex == 0" class="search-bar">
+                    <div>
+                        <input type="text" v-model="filterKey">
+                    </div>
+
+                    <ul>
+                        <li v-for="node in listNodes" :title="node.label" :data-id="node.id"
+                            @click="focus($event.target)">
+                            {{node.label}}
+                        </li>
+                    </ul>
                 </div>
+                <div v-show="activeTabIndex == 1">
 
-                <ul>
-                    <li v-for="node in listNodes" :title="node.label" :data-id="node.id" @click="focus($event.target)">
-                        {{node.label}}
-                    </li>
-                </ul>
+                    <ul>
+                        <li v-for="category in categories" :title="category.label" :data-category="category.label"
+                            @click="searchCategory($event.target)">
+                            {{category.label}} {{category.count}}
+                        </li>
+                    </ul>
+                </div>
             </div>
-
         </div>
+
 
 
         <div class="attr-bar">
@@ -401,6 +434,7 @@
         graph.render();
 
         var graphUpdate = _.throttle(function (event, args) {
+            console.log("graphUpdate 触发");
             app.$set(app.graphData, 'nodes', graph.save().nodes);
         }, 100, {
             leading: false,
@@ -549,21 +583,32 @@
                     }
                 },
                 categories() {
-                    var categories = {};
-                    graph.save().nodes.forEach(it => {
+                    var categoriesMap = {};
+
+                    // 需要理解computed的原理，推测只要有JSON.stringify的调用就会强制调用，其它情况会根据引用决定
+                    //    console.log(JSON.stringify(  graph.save().nodes));
+
+                    this.graphData.nodes.forEach(it => {
                         if (it.category) {
-                            if (categories[it.category] === undefined) {
-                                categories[it.category] = 1
+                            if (categoriesMap[it.category] === undefined) {
+                                categoriesMap[it.category] = 1
                             } else {
-                                categories[it.category]++
+                                categoriesMap[it.category]++
                             }
                         }
                     });
-                    // console.log(categories);
+
+                    var categories = [];
+                    for (var k in categoriesMap) {
+                        categories.push({
+                            label: k,
+                            count: categoriesMap[k]
+                        })
+                    }
                     return categories;
                 },
                 listNodes: function () {
-                    console.log("listNodes 更新", JSON.stringify(this.graphData.nodes))
+                    // console.log("listNodes 更新", JSON.stringify(this.graphData.nodes))
                     // var sortKey = this.sortKey
                     var filterKey = this.filterKey && this.filterKey.toLowerCase()
 
@@ -600,6 +645,9 @@
 
             },
             methods: {
+                activeTab: function (index) {
+                    this.activeTabIndex = index;
+                },
                 updateItem: function () {
 
                     if (this.currentType == "Node") {
@@ -677,6 +725,11 @@
                     $("#content").html(html);
 
                 },
+                searchCategory(target) {
+                    this.activeTabIndex = 0;
+                    var { category } = target.dataset;
+                    this.filterKey = "c:" + category;
+                },
                 focus: function (target) {
                     console.log(target, this);
 
@@ -736,7 +789,7 @@
             data: {
                 currentType: '', //Node、Edge
                 currentItem: {},
-
+                activeTabIndex: 0,
                 showSearch: true,
                 showAttr: true,
                 filterKey: "",
