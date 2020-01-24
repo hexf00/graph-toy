@@ -552,13 +552,26 @@
                     console.log("listNodes 更新", JSON.stringify(this.graphData.nodes))
                     // var sortKey = this.sortKey
                     var filterKey = this.filterKey && this.filterKey.toLowerCase()
+
+
                     // var order = this.sortOrders[sortKey] || 1
                     var nodes = this.graphData.nodes
                     if (filterKey) {
                         nodes = nodes.filter(function (row) {
-                            return Object.keys(row).some(function (key) {
-                                return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-                            })
+
+                            // console.log(filterKey.)
+                            var start = filterKey.indexOf("c:");
+                            if (start !== -1) {
+                                var filterVal = filterKey.slice(start + 2);
+
+                                return row.category && row.category.toLowerCase().indexOf(filterVal) > -1;
+                            } else {
+                                return Object.keys(row).some(function (key) {
+                                    return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+                                })
+                            }
+
+
                         })
                     }
                     // if (sortKey) {
