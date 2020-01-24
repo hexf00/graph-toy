@@ -595,6 +595,13 @@
                             } else {
                                 categoriesMap[it.category]++
                             }
+                        } else {
+                            var key = "none";
+                            if (categoriesMap[key] === undefined) {
+                                categoriesMap[key] = 1
+                            } else {
+                                categoriesMap[key]++
+                            }
                         }
                     });
 
@@ -623,14 +630,18 @@
                             if (start !== -1) {
                                 var filterVal = filterKey.slice(start + 2);
 
-                                return row.category && row.category.toLowerCase().indexOf(filterVal) > -1;
+                                if (filterVal == "") {
+                                    return true //全部
+                                } else if (filterVal == "none") {
+                                    return !row.category
+                                } else {
+                                    return row.category && row.category.toLowerCase().indexOf(filterVal) > -1;
+                                }
                             } else {
                                 return Object.keys(row).some(function (key) {
                                     return String(row[key]).toLowerCase().indexOf(filterKey) > -1
                                 })
                             }
-
-
                         })
                     }
                     // if (sortKey) {
