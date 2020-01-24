@@ -548,6 +548,20 @@
                         return graph.findById(this.currentItem.target).getModel().label
                     }
                 },
+                categories() {
+                    var categories = {};
+                    graph.save().nodes.forEach(it => {
+                        if (it.category) {
+                            if (categories[it.category] === undefined) {
+                                categories[it.category] = 1
+                            } else {
+                                categories[it.category]++
+                            }
+                        }
+                    });
+                    // console.log(categories);
+                    return categories;
+                },
                 listNodes: function () {
                     console.log("listNodes 更新", JSON.stringify(this.graphData.nodes))
                     // var sortKey = this.sortKey
