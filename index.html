@@ -77,12 +77,11 @@
             /* max-height: 200px; */
         }
 
-        .reader-bar {
-            display: none;
-        }
+
 
         .reader-bar {
-            top: 60px;
+            /* top: 60px; */
+            right: 250px;
             border: 1px solid rgb(165, 76, 76);
         }
 
@@ -202,9 +201,13 @@
 
         </div>
 
-        <div class="reader-bar">
+        <div v-if="!showReader" class="reader-bar">
+            <div @click="showReader=true">+</div>
+        </div>
+        <div v-else class="reader-bar">
             <div>
                 <button @click="createSelectedTextNode">选中文字创建节点</button>
+                <span style="float: right;" @click="showReader=false">x</span>
             </div>
             <div id="content" class="content" @mouseup="getSelection">
                 <h2 class="tutheader">设计模式的六大原则</h2>
@@ -699,6 +702,9 @@
 
                 },
                 createSelectedTextNode: function () {
+                    if(window.getSelection().toString() == ""){
+                        return;
+                    }
                     const nodes = graph.findAllByState('node', 'selected');
                     var id = new Date().getTime() + parseInt(Math.random() * 1000).toString();
 
@@ -728,10 +734,17 @@
 
                     //原文标注
                     var html = $("#content").html();
-                    html = html.replace(
+                    // html = html.replace(
+                    //     new RegExp(window.getSelection().toString(), 'g'),
+                    //     `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${window.getSelection().toString()}</span>`
+                    // )
+
+                    html = mark(html,
                         new RegExp(window.getSelection().toString(), 'g'),
-                        `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${window.getSelection().toString()}</span>`
-                    )
+                        {
+                            html: `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${window.getSelection().toString()}</span>`,
+                        }
+                    );
 
                     $("#content").html(html);
 
@@ -801,6 +814,7 @@
                 currentType: '', //Node、Edge
                 currentItem: {},
                 activeTabIndex: 0,
+                showReader: true,
                 showSearch: true,
                 showAttr: true,
                 filterKey: "",
