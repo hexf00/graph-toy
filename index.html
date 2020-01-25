@@ -11,6 +11,8 @@
 
 
     <script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.staticfile.org/moment.js/2.24.0/moment.js"></script>
+    <script src="https://cdn.staticfile.org/moment.js/2.24.0/locale/zh-cn.js"></script>
 
 
     <script src="res/mark.js"></script>
@@ -139,7 +141,14 @@
 
 <body>
     <div id="app">
+        <div class="file-handler">
+            <button onclick="$('#fileSelect').click()">导入</button>
+            <input type="file" onchange="importData(this)" name="" id="fileSelect" style="width:0px;height:1px;">
 
+            <button onclick="exportData()">导出</button>
+
+            <span>自动保存状态:{{saveTimeShowText}}</span>
+        </div>
         <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
         <div v-else class="tab left-bar">
             <ul class="tab-title">
@@ -232,14 +241,7 @@
         </div>
 
     </div>
-    <div class="file-handler">
-        <button onclick="$('#fileSelect').click()">导入</button>
-        <input type="file" onchange="importData(this)" name="" id="fileSelect" style="width:0px;height:1px;">
 
-        <button onclick="exportData()">导出</button>
-
-
-    </div>
     <div class="menu">
         <ul>
             <li><a href="javascript:;" onclick="rule_selected(this)">选中一级节点</a></li>
@@ -289,8 +291,55 @@
             }
         }
 
+        //载入缓存
+        localStorage.setItem("auto-save-data-key", "auto-save-data");
+        var data = { "nodes": [], "edges": [] }
+        try {
+            var key = localStorage.getItem("auto-save-data-key");
+            var rawData = localStorage.getItem(key);
+            if (key && rawData) {
+                data = JSON.parse(rawData);
+            }
+        } catch (e) {
+            console.error(e);
+        }
 
-        let data = { "nodes": [{ "id": "node1", "realId": "node1", "label": "设计模式", "x": 214.9658422396884, "y": 221.84518870936557, "index": 0, "vy": -0.000419785037246328, "vx": 0.00015216469078658084 }, { "id": "1578917180400130", "realId": "1578917180400130", "label": "对接口编程而不是对实现编程", "x": 247.6357258386712, "y": 75.78402168043746, "index": 1, "vy": -0.00043035250004550295, "vx": 0.00003607174776372558 }, { "id": "1578917184600596", "realId": "1578917184600596", "label": "优先使用对象组合而不是继承", "x": 302.40696000426817, "y": 100.27972272224079, "index": 2, "vy": -0.0004684589106864432, "vx": 0.00007221059017097597 }, { "id": "157891727036066", "realId": "157891727036066", "label": "标准的术语系统", "x": 125.92414536447245, "y": 101.55161539455258, "index": 3, "vy": -0.0002814231973210496, "vx": -0.000005245404689546663 }, { "id": "1578917303880965", "realId": "1578917303880965", "label": "一般问题的最佳解决方案", "x": 65.47296078556997, "y": 212.87090670587207, "index": 4, "vy": 0.00024289966587907901, "vx": 0.0001349379146521375 }, { "id": "1578917348912574", "realId": "1578917348912574", "label": "创建型模式（Creational Patterns）", "x": 343.5588414348191, "y": 143.94176505365786, "index": 5, "vy": -0.0004817818300787123, "vx": 0.0001384327602174318 }, { "id": "157891735518431", "realId": "157891735518431", "label": "结构型模式（Structural Patterns）", "x": 401.80322586562806, "y": 451.3565003604633, "index": 6, "vy": -0.00045131067745247065, "vx": 0.00015303815563441254 }, { "id": "1578917357264931", "realId": "1578917357264931", "label": "行为型模式（Behavioral Patterns）", "x": 89.38833400653095, "y": 303.5146094102858, "index": 7, "vy": 0.0001480299081528974, "vx": 0.0005382770178448653 }, { "id": "1578917414832352", "realId": "1578917414832352", "label": "工厂模式（Factory Pattern）", "x": 491.82168470156614, "y": 123.27456709173887, "index": 8, "vy": 0.0006353153258787534, "vx": 0.00026480372306693844 }, { "id": "1578917426247917", "realId": "1578917426247917", "label": "抽象工厂模式（Abstract Factory Pattern）", "x": 442.55890899783003, "y": 256.4209884144119, "index": 9, "vy": 0.00004974055477296322, "vx": -0.0004622097450878281 }, { "id": "1578917433056713", "realId": "1578917433056713", "label": "单例模式（Singleton Pattern）", "x": 390.79423407867193, "y": 286.759404834658, "index": 10, "vy": -0.00021924277502230049, "vx": -0.0006195253730624692 }, { "id": "1578917440264172", "realId": "1578917440264172", "label": "建造者模式（Builder Pattern）", "x": 331.1670021142153, "y": 293.4348452888833, "index": 11, "vy": -0.0005428805093202818, "vx": -0.000663416185068655 }, { "id": "1578917453375513", "realId": "1578917453375513", "label": "原型模式（Prototype Pattern）", "x": 482.8075576047107, "y": 199.02151914527872, "index": 12, "vy": 0.000654634733073523, "vx": -0.00033576870120090817 }, { "id": "1578917512184374", "realId": "1578917512184374", "label": "适配器模式（Adapter Pattern）", "x": 330.72786780679394, "y": 202.5506171752201, "index": 13, "vy": -0.0003708663344024889, "vx": 0.0002310267642672594 }, { "id": "157891751900849", "realId": "157891751900849", "label": "桥接模式（Bridge Pattern）", "x": 270.7890689495779, "y": 199.85729056507807, "index": 14, "vy": -0.00045909577315954737, "vx": 0.00021415630321250603 }, { "id": "1578917526800994", "realId": "1578917526800994", "label": "过滤器模式（Filter、Criteria Pattern）", "x": 149.4680825792468, "y": 379.03784003940643, "index": 15, "vy": -0.00034656145441930297, "vx": 0.00018166808748062516 }, { "id": "1578917534240632", "realId": "1578917534240632", "label": "组合模式（Composite Pattern）", "x": 171.92669399843362, "y": 263.6475953185492, "index": 16, "vy": -0.0003924338557244156, "vx": 0.00011488748098551506 }, { "id": "157891755247297", "realId": "157891755247297", "label": "装饰器模式（Decorator Pattern）", "x": 445.5392443724995, "y": 337.9280774466434, "index": 17, "vy": -0.0010422453333864435, "vx": 0.00009221426211969792 }, { "id": "1578917574288269", "realId": "1578917574288269", "label": "外观模式（Facade Pattern）", "x": 173.52292809054654, "y": 434.00409219774315, "index": 18, "vy": -0.00035189578692833507, "vx": 0.00023913296076485678 }, { "id": "1578917581856453", "realId": "1578917581856453", "label": "享元模式（Flyweight Pattern）", "x": 148.8733465207705, "y": 319.0420191456038, "index": 19, "vy": -0.00038165829954899135, "vx": 0.00014016196560202363 }, { "id": "1578917588144372", "realId": "1578917588144372", "label": "代理模式（Proxy Pattern）", "x": 385.52221616663496, "y": 226.99362055398979, "index": 20, "vy": -0.00035864418263957, "vx": 0.0002569491989826853 }], "edges": [{ "source": "node1", "target": "1578917180400130", "style": { "lineWidth": 3 }, "startPoint": { "x": 221.73249322546718, "y": 191.59271055572236 }, "endPoint": { "x": 240.86907485289242, "y": 106.03649983408067 } }, { "source": "node1", "target": "1578917184600596", "style": { "lineWidth": 3 }, "startPoint": { "x": 233.06755925947894, "y": 196.67918304824752 }, "endPoint": { "x": 284.3052429844776, "y": 125.44572838335884 } }, { "source": "node1", "target": "157891727036066", "style": { "lineWidth": 3 }, "startPoint": { "x": 196.52243646910173, "y": 196.9285118927937 }, "endPoint": { "x": 144.36755113505913, "y": 126.46829221112445 } }, { "source": "node1", "target": "1578917303880965", "style": { "lineWidth": 3 }, "startPoint": { "x": 184.02155032153385, "y": 219.98755643035184 }, "endPoint": { "x": 96.41725270372453, "y": 214.7285389848858 } }, { "source": "node1", "target": "1578917348912574", "style": { "lineWidth": 3 }, "startPoint": { "x": 241.47987421080586, "y": 205.78262015279398 }, "endPoint": { "x": 317.04480946370165, "y": 160.00433361022945 } }, { "source": "node1", "target": "157891735518431", "style": { "lineWidth": 3 }, "startPoint": { "x": 234.5368843101274, "y": 245.88628502956502 }, "endPoint": { "x": 382.2321837951891, "y": 427.3154040402639 } }, { "source": "node1", "target": "1578917357264931", "style": { "lineWidth": 3 }, "startPoint": { "x": 188.97825545338995, "y": 238.7462340327947 }, "endPoint": { "x": 115.37592079282943, "y": 286.6135640868567 } }, { "source": "1578917348912574", "target": "1578917414832352", "style": { "lineWidth": 3 }, "startPoint": { "x": 374.26197793979077, "y": 139.6618808546315 }, "endPoint": { "x": 461.1185481965945, "y": 127.55445129076523 } }, { "source": "1578917348912574", "target": "1578917426247917", "style": { "lineWidth": 3 }, "startPoint": { "x": 364.04044571074894, "y": 167.2120011135738 }, "endPoint": { "x": 422.0773047219002, "y": 233.15075235449598 } }, { "source": "1578917348912574", "target": "1578917433056713", "style": { "lineWidth": 3 }, "startPoint": { "x": 353.29316005945265, "y": 173.37377213632405 }, "endPoint": { "x": 381.0599154540384, "y": 257.32739775199184 } }, { "source": "1578917348912574", "target": "1578917440264172", "style": { "lineWidth": 3 }, "startPoint": { "x": 340.9979602545435, "y": 174.8358079677944 }, "endPoint": { "x": 333.7278832944909, "y": 262.54080237474676 } }, { "source": "1578917348912574", "target": "1578917453375513", "style": { "lineWidth": 3 }, "startPoint": { "x": 372.38564599112283, "y": 155.34419194764263 }, "endPoint": { "x": 453.980753048407, "y": 187.61909225129395 } }, { "source": "157891735518431", "target": "1578917512184374", "style": { "lineWidth": 3 }, "startPoint": { "x": 393.28820415479464, "y": 421.5488770861391 }, "endPoint": { "x": 339.24288951762736, "y": 232.35824044954433 } }, { "source": "157891735518431", "target": "157891751900849", "style": { "lineWidth": 3 }, "startPoint": { "x": 387.48111043228954, "y": 423.86328284206206 }, "endPoint": { "x": 285.1111843829164, "y": 227.35050808347935 } }, { "source": "157891735518431", "target": "1578917526800994", "style": { "lineWidth": 3 }, "startPoint": { "x": 372.0029471056112, "y": 442.8158103517293 }, "endPoint": { "x": 179.26836133926366, "y": 387.57853004814046 } }, { "source": "157891735518431", "target": "1578917534240632", "style": { "lineWidth": 3 }, "startPoint": { "x": 377.7915224477041, "y": 431.7494072824556 }, "endPoint": { "x": 195.9383974163576, "y": 283.2546883965569 } }, { "source": "157891735518431", "target": "157891755247297", "style": { "lineWidth": 3 }, "startPoint": { "x": 412.95594255915137, "y": 422.43216959285513 }, "endPoint": { "x": 434.3865276789762, "y": 366.85240821425157 } }, { "source": "157891735518431", "target": "1578917574288269", "style": { "lineWidth": 3 }, "startPoint": { "x": 370.892399665915, "y": 449.006857057506 }, "endPoint": { "x": 204.4337542902596, "y": 436.35373550070045 } }, { "source": "157891735518431", "target": "1578917581856453", "style": { "lineWidth": 3 }, "startPoint": { "x": 374.33474766607725, "y": 436.986994265931 }, "endPoint": { "x": 176.34182472032134, "y": 333.4115252401361 } }, { "source": "157891735518431", "target": "1578917588144372", "style": { "lineWidth": 3 }, "startPoint": { "x": 399.5595941064712, "y": 420.43779863271766 }, "endPoint": { "x": 387.76584792579183, "y": 257.91232228173544 } }], "groups": [] };
+
+        //needAutoSaveStatus 用来判断是否需要保存
+        var needAutoSaveStatus = false;
+        setInterval(function () {
+            if (needAutoSaveStatus) {
+
+                console.log("触发自动保存");
+                // localStorage.setItem();
+
+                var root = graph.save().nodes[0].label;
+                var saveIndexData = [];
+
+                var key = localStorage.getItem("auto-save-data-key");
+                localStorage.setItem(key, JSON.stringify(graph.save()));
+                exportData(); //调用下载自动保存
+
+                app.saveTime = new Date();
+
+                needAutoSaveStatus = false; //更新保存状态
+            }
+        }, 5000); //5s尝试保存一次
+
+
+        //1s更新显示保存时间
+        setInterval(function () {
+            if (app) {
+                if (app.saveTime) {
+                    if (moment().diff(app.saveTime, 'seconds') < 44) {
+                        app.saveTimeShowText = moment().diff(app.saveTime, 'seconds') + "秒前";
+                    } else {
+                        app.saveTimeShowText = moment(app.saveTime).fromNow();
+
+                    }
+                }
+            }
+        }, 1000)
 
         data.edges = data.edges.map((edge) => {
             edge.style.endArrow = true
@@ -449,6 +498,7 @@
 
         var graphUpdate = _.throttle(function (event, args) {
             console.log("graphUpdate 触发");
+            needAutoSaveStatus = true; //需要保存
             app.$set(app.graphData, 'nodes', graph.save().nodes);
         }, 100, {
             leading: false,
@@ -678,12 +728,13 @@
                     if (this.currentType == "Node") {
 
                         var item = graph.findById(this.currentItem.id);
-                        item.update({
+                        //item.update 不会触发g6事件 改为 graph.updateItem
+                        graph.updateItem(item, {
                             // id: this.currentItem.id,
                             description: this.currentItem.description,
                             category: this.currentItem.category,
                             label: this.currentItem.label
-                        });
+                        })
 
                         graph.refreshItem(item)
                     } else {
@@ -829,10 +880,13 @@
                 showSearch: true,
                 showAttr: true,
                 filterKey: "",
+                saveTime: "", //自动保存时间
+                saveTimeShowText: "无", //保存时间显示
                 graphData: graph.save(),
                 // nodes: graph.save().nodes,
             }
         })
+
     </script>
 </body>
 
