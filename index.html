@@ -24,6 +24,7 @@
     <script src="res/custom-drag-node.js"></script>
     <script src="res/node-dblclick-edit.js"></script>
     <script src="res/shortcut-keys.js"></script>
+    <script src="res/dblclick-new.js"></script>
 
     <style>
         html,
@@ -340,7 +341,17 @@
             height: Math.floor($('#mountNode').height()),             // Number，必须，图的高度
             // renderer: "svg",
             modes: {
-                default: ['shortcut-keys', 'edgeClick', 'brush-select', 'custom-drag-node', 'node-dblclick-edit', 'node-click', 'drag-canvas', 'zoom-canvas']
+                default: [
+                    'dblclick-new',
+                    'shortcut-keys',
+                    'edgeClick',
+                    'brush-select',
+                    'custom-drag-node',
+                    'node-dblclick-edit',
+                    'node-click',
+                    'drag-canvas',
+                    'zoom-canvas'
+                ]
             },
             defaultEdge: {
                 style: {
@@ -702,7 +713,7 @@
 
                 },
                 createSelectedTextNode: function () {
-                    if(window.getSelection().toString() == ""){
+                    if (window.getSelection().toString() == "") {
                         return;
                     }
                     const nodes = graph.findAllByState('node', 'selected');
