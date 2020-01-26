@@ -812,8 +812,11 @@
 
                     for (var node of nodes) {
                         var { id, label } = node;
+                        if(!label){
+                            continue;
+                        }
                         try {
-
+                            
                             html = html.replace(
                                 new RegExp(label, 'g'),
                                 `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${label}</span>`
