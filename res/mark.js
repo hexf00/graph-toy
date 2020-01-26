@@ -13,11 +13,18 @@ function mark(str, regexp, replace) {
       return replace(str) //处理
     } else { //object
       let node
-      if ($(str)[0]) {
-        node = $(str)
-      } else {
-        node = $('<span>' + str + '</span>')
-      }
+      // console.log("--",str);
+      // console.log($(str));
+      // console.log(str,"--");
+      // if ($(str)[0]) {
+      //   node = $(str)
+      // } else {
+      //   node = $('<span>' + str + '</span>')
+      // }
+
+      node = $('<span>' + str + '</span>')
+
+
       if (replace.html) {
         node.html(replace.html)
       }

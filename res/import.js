@@ -27,6 +27,7 @@ var importArticle = function (el) {
     var reader = new FileReader();
     reader.readAsText(file);
     reader.onload = function (e) {
-        $("#content").html(this.result);
+        localStorage.setItem('reader-text', this.result);
+        app.rerenderReader();
     }
 }

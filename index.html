@@ -27,7 +27,7 @@
     <script src="res/node-dblclick-edit.js"></script>
     <script src="res/shortcut-keys.js"></script>
     <script src="res/dblclick-new.js"></script>
-    
+
     <link rel="stylesheet" href="https://cdn.staticfile.org/normalize/8.0.1/normalize.css">
     <link rel="stylesheet" href="res/css/reader.css">
     <style>
@@ -800,6 +800,44 @@
                     $("#content").html(html);
 
                 },
+                renderReader() {
+                    //渲染标注文本
+                    var html = localStorage.getItem('reader-text');
+                    // console.log(html);
+                    var nodes = graph.save().nodes;
+
+                    nodes = nodes.sort((a,b)=>{
+                        return b.label.length - a.label.length
+                    })
+
+                    for (var node of nodes) {
+                        var { id, label } = node;
+                        try {
+
+                            html = html.replace(
+                                new RegExp(label, 'g'),
+                                `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${label}</span>`
+                            )
+
+                            //mark函数存在非常严重的bug
+
+                            // html = mark(html,
+                            //     new RegExp(label
+                            //         // .replace(/\//g, "\\\/")
+                            //         // .replace(/\@/g, "\\\@")
+                            //         , 'g'),
+                            //     {
+                            //         html: `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${label}</span>`,
+                            //     }
+                            // );
+                        } catch (error) {
+                            console.error(error)
+                        }
+
+                    }
+                    $("#content").html(html);
+
+                },
                 searchCategory(target) {
                     this.activeTabIndex = 0;
                     var { category } = target.dataset;
@@ -860,6 +898,9 @@
 
                     console.log(this, id)
                 }
+            },
+            created() {
+                this.renderReader();
             },
             data: {
                 currentType: '', //Node、Edge
