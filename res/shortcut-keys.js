@@ -11,7 +11,11 @@ G6.registerBehavior('shortcut-keys', {
         if (document.activeElement.getAttribute("type") == "text") {
             return;
         }
-        
+
+        if (e && (e.key == 'Control' || e.key == 'c')) {
+            return;
+        }
+
         e.preventDefault();
         if (!this.shouldUpdate.call(this, e)) {
             return;
