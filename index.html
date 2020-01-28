@@ -825,7 +825,7 @@
                         try {
                             
                             html = html.replace(
-                                new RegExp(label, 'g'),
+                                new RegExp(label.replace(/\*/g, "\\\*"), 'g'),
                                 `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${label}</span>`
                             )
 
