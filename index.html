@@ -233,7 +233,7 @@
 
                 <span style="float: right;" @click="showReader=false">x</span>
             </div>
-            <div id="content" class="content" @mouseup="getSelection"></div>
+            <div id="content" class="content" @mouseup="getSelection" v-html="contentHtml"></div>
         </div>
 
     </div>
@@ -845,7 +845,9 @@
                         }
 
                     }
-                    $("#content").html(html);
+
+                    this.contentHtml = html;
+                    // $("#content").html(html);
 
                 },
                 searchCategory(target) {
@@ -913,6 +915,7 @@
                 this.renderReader();
             },
             data: {
+                contentHtml:'',
                 currentType: '', //Node、Edge
                 currentItem: {},
                 activeTabIndex: 0,
