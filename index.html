@@ -81,12 +81,15 @@
             max-width: 300px;
             /* max-height: 200px; */
         }
+        .attr-bar{
+            width: 280px;
+        }
 
 
 
         .reader-bar {
             /* top: 60px; */
-            right: 250px;
+            right: 300px;
             border: 1px solid rgb(165, 76, 76);
         }
 
@@ -97,6 +100,10 @@
 
         .attr-bar {
             right: 0;
+        }
+
+        .left-bar, .attr-bar{
+            font-size: 12px;
         }
 
         .search-bar ul,
@@ -204,7 +211,7 @@
                             name="category"></p>
                     <div>
                         <div>描述:</div>
-                        <textarea style="width: 98%;min-height: 80px;" type="text" v-model="currentItem.description"
+                        <textarea style="width: 98%;min-height: 150px;" type="text" v-model="currentItem.description"
                             name="description"></textarea>
                     </div>
                     <button type="button" @click="updateItem()">保存</button>
@@ -565,7 +572,7 @@
 
             const subForceLayout = new G6.Layout.force({
                 center: [centerNode.x, centerNode.y],
-                linkDistance: 120,
+                linkDistance: 200,
                 preventOverlap: true,
                 // nodeSize: 20,
                 tick: function tick() {
