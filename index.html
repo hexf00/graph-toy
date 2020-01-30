@@ -28,6 +28,7 @@
     <script src="res/shortcut-keys.js"></script>
     <script src="res/dblclick-new.js"></script>
 
+    <script src="res/component/set-category.js"></script>
     <link rel="stylesheet" href="https://cdn.staticfile.org/normalize/8.0.1/normalize.css">
     <link rel="stylesheet" href="res/css/reader.css">
     <style>
@@ -52,7 +53,8 @@
 
         .file-handler {
             position: fixed;
-            z-index: 999;
+            /* 要比reader高，否则会被遮住，最大z-index取决于父级的最大z-index */
+            z-index: 1000; 
             top: 0;
         }
 
@@ -155,7 +157,8 @@
             <input type="file" onchange="importData(this)" name="" id="fileSelect" style="width:0px;height:1px;">
 
             <button onclick="exportData()">导出</button>
-
+            
+            <set-category></set-category>
             <span>自动保存状态:{{saveTimeShowText}}</span>
         </div>
         <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
