@@ -54,7 +54,7 @@
         .file-handler {
             position: fixed;
             /* 要比reader高，否则会被遮住，最大z-index取决于父级的最大z-index */
-            z-index: 1000; 
+            z-index: 1000;
             top: 0;
         }
 
@@ -83,7 +83,8 @@
             max-width: 300px;
             /* max-height: 200px; */
         }
-        .attr-bar{
+
+        .attr-bar {
             width: 280px;
         }
 
@@ -104,7 +105,8 @@
             right: 0;
         }
 
-        .left-bar, .attr-bar{
+        .left-bar,
+        .attr-bar {
             font-size: 12px;
         }
 
@@ -146,7 +148,17 @@
             font-weight: bold;
         }
     </style>
-
+    <style>
+        .g6-tooltip {
+            border: 1px solid #e2e2e2;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #545454;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 8px;
+            box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+        }
+    </style>
 
 </head>
 
@@ -157,7 +169,7 @@
             <input type="file" onchange="importData(this)" name="" id="fileSelect" style="width:0px;height:1px;">
 
             <button onclick="exportData()">导出</button>
-            
+
             <set-category></set-category>
             <span>自动保存状态:{{saveTimeShowText}}</span>
         </div>
@@ -362,7 +374,21 @@
                     'node-dblclick-edit',
                     'node-click',
                     'drag-canvas',
-                    'zoom-canvas'
+                    'zoom-canvas',
+                    // 边提示框交互工具的配置
+                    {
+                        type: 'edge-tooltip',
+                        formatText(model) {
+                            var target = this.graph.findById(model.target).getModel();
+                            var source = this.graph.findById(model.source).getModel();
+
+                            const text = `${source.label} ==${model.label||""}==> ${ target.label}`;
+                            return text;
+                        },
+                        shouldUpdate: e => {
+                            return true;
+                        }
+                    }
                 ]
             },
             defaultEdge: {
@@ -780,17 +806,17 @@
                     // console.log(html);
                     var nodes = graph.save().nodes;
 
-                    nodes = nodes.sort((a,b)=>{
+                    nodes = nodes.sort((a, b) => {
                         return b.label.length - a.label.length
                     })
 
                     for (var node of nodes) {
                         var { id, label } = node;
-                        if(!label){
+                        if (!label) {
                             continue;
                         }
                         try {
-                            
+
                             html = html.replace(
                                 new RegExp(label.replace(/\*/g, "\\\*"), 'g'),
                                 `<span class="highlight" data-id="${id}" onclick="app.focus(this)">${label}</span>`
@@ -882,7 +908,7 @@
                 this.renderReader();
             },
             data: {
-                contentHtml:'',
+                contentHtml: '',
                 currentType: '', //Node、Edge
                 currentItem: {},
                 activeTabIndex: 0,
