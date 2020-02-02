@@ -20,7 +20,9 @@ G6.registerBehavior('node-click', {
             });
         }
 
-        graph.setItemState(item, 'selected', true);
+        
+
+        graph.setItemState(item, 'selected', !item.hasState('selected'));
 
         // VUE面板用
         app.currentType = "Node";
