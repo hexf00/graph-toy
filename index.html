@@ -171,6 +171,7 @@
             <button onclick="exportData()">导出</button>
 
             <set-category></set-category>
+            <button onclick="hide()">隐藏边</button>
             <span>自动保存状态:{{saveTimeShowText}}</span>
         </div>
         <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
@@ -195,7 +196,7 @@
                         </li>
                     </ul>
                 </div>
-                <div v-show="activeTabIndex == 1"  class="search-bar">
+                <div v-show="activeTabIndex == 1" class="search-bar">
 
                     <ul>
                         <li v-for="category in categories" :title="category.label" :data-category="category.label"
@@ -382,7 +383,7 @@
                             var target = this.graph.findById(model.target).getModel();
                             var source = this.graph.findById(model.source).getModel();
 
-                            const text = `${source.label} ==${model.label||""}==> ${ target.label}`;
+                            const text = `${source.label} ==${model.label || ""}==> ${target.label}`;
                             return text;
                         },
                         shouldUpdate: e => {
@@ -617,6 +618,21 @@
                     graph.setItemState(targetId, 'selected', true);
                 }
             })
+        }
+
+        //隐藏edge
+        hide = function (el) {
+            const clickEdges = graph.findAllByState('edge', 'selected');
+            clickEdges.forEach(item => {
+                graph.setItemState(item, 'selected', false);
+
+                item.hide();
+                graph.updateItem(item, {
+                    visible: false, //不可见
+                })
+                graph.refreshItem(item)
+
+            });
         }
     </script>
 
