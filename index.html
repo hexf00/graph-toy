@@ -265,7 +265,8 @@
 
                 <span style="float: right;" @click="showReader=false">x</span>
             </div>
-            <div id="content" class="content" @mouseup="getSelection" v-html="contentHtml"></div>
+            <div id="content" ref="readerContent" class="content" @scroll="readerScroll" @mouseup="getSelection"
+                v-html="contentHtml"></div>
         </div>
 
     </div>
@@ -768,6 +769,9 @@
 
             },
             methods: {
+                readerScroll: function (e) {
+                    localStorage.setItem('reader-scroll-top', e.target.scrollTop);
+                },
                 activeTab: function (index) {
                     this.activeTabIndex = index;
                 },
@@ -899,6 +903,15 @@
                     }
 
                     this.contentHtml = html;
+
+                    //渲染后更新滚动条位置
+                    this.$nextTick(() => {
+                        var scrollTop = localStorage.getItem('reader-scroll-top');
+                        if(scrollTop){
+                            this.$refs.readerContent.scrollTop = scrollTop
+                        }
+                    });
+
                     // $("#content").html(html);
 
                 },

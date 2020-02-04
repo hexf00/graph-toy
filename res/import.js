@@ -28,6 +28,7 @@ var importArticle = function (el) {
     reader.readAsText(file);
     reader.onload = function (e) {
         localStorage.setItem('reader-text', this.result);
-        app.rerenderReader();
+        localStorage.setItem('reader-scroll-top', 0);
+        app.renderReader();
     }
 }
