@@ -147,6 +147,10 @@
         ul.tab-title li.active {
             font-weight: bold;
         }
+
+        span.strong {
+            font-weight: bold;
+        }
     </style>
     <style>
         .g6-tooltip {
@@ -232,6 +236,17 @@
                             name="description"></textarea>
                     </div>
                     <button type="button" @click="updateItem()">保存</button>
+                    <ul v-if="currentType == 'Node'">
+                        <li v-for="edge in currentItemEdges">
+                            <span :class="{strong:currentItem.id !== edge.source}" :data-id="edge.source"
+                                :title="edge.sourceModel.category"
+                                @click="focus($event.target)">{{edge.sourceModel.label}}</span>
+                            =={{edge.label}}==>
+                            <span :class="{strong:currentItem.id !== edge.target}" :data-id="edge.target"
+                                :title="edge.sourceModel.category"
+                                @click="focus($event.target)">{{edge.targetModel.label}}</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -650,6 +665,34 @@
                     if (this.currentType == "Edge") {
                         return graph.findById(this.currentItem.target).getModel().label
                     }
+                },
+                currentItemEdges() {
+                    if (this.currentType == "Node") {
+                        // return graph.findById(this.currentItem.target).getModel().label
+                        var result = this.graphData.edges.filter((edge) => {
+                            const sourceId = edge.source;
+                            const targetId = edge.target;
+
+                            if (sourceId === this.currentItem.id || targetId === this.currentItem.id) {
+                                return true
+                                // graph.setItemState(targetId, 'selected', true);
+                            }
+                        });
+
+                        result = JSON.parse(JSON.stringify(result));
+
+                        result = result.map(it => {
+                            var source = graph.findById(it.source);
+                            var target = graph.findById(it.target);
+                            it.sourceModel = source.getModel();
+                            it.targetModel = target.getModel();
+                            return it;
+                        })
+
+                        return result;
+                    }
+
+
                 },
                 categories() {
                     var categoriesMap = {};
