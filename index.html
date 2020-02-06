@@ -29,6 +29,8 @@
     <script src="res/dblclick-new.js"></script>
 
     <script src="res/component/set-category.js"></script>
+    <script src="res/component/tab/tab.js"></script>
+    <script src="res/component/tab/panel.js"></script>
     <link rel="stylesheet" href="https://cdn.staticfile.org/normalize/8.0.1/normalize.css">
     <link rel="stylesheet" href="res/css/reader.css">
     <style>
@@ -180,14 +182,9 @@
         </div>
         <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
         <div v-else class="tab left-bar">
-            <ul class="tab-title">
-                <li :class="{active: activeTabIndex == 0}" @click="activeTab(0)">节点</li>
-                /
-                <li :class="{active: activeTabIndex == 1}" @click="activeTab(1)">类型</li>
-                <span style="float: right;" @click="showSearch=false">x</span>
-            </ul>
-            <div class="tab-content">
-                <div v-show="activeTabIndex == 0" class="search-bar">
+            <span style="float: right;" @click="showSearch=false">x</span>
+            <tab v-model="leftTabActive">
+                <panel title="节点" class="search-bar">
                     <div>
                         <input type="text" v-model="filterKey">
                         <span title="找到节点数">{{listNodes.length}}</span>
@@ -199,17 +196,16 @@
                             {{node.label}}
                         </li>
                     </ul>
-                </div>
-                <div v-show="activeTabIndex == 1" class="search-bar">
-
+                </panel>
+                <panel title="类型" class="search-bar">
                     <ul>
                         <li v-for="category in categories" :title="category.label" :data-category="category.label"
                             @click="searchCategory($event.target)">
                             {{category.label}} {{category.count}}
                         </li>
                     </ul>
-                </div>
-            </div>
+                </panel>
+            </tab>
         </div>
 
 
@@ -236,6 +232,7 @@
                             name="description"></textarea>
                     </div>
                     <button type="button" @click="updateItem()">保存</button>
+                    {{currentItem}}
                     <ul v-if="currentType == 'Node'">
                         <li v-for="edge in currentItemEdges">
                             <span :class="{strong:currentItem.id !== edge.source}" :data-id="edge.source"
@@ -772,9 +769,6 @@
                 readerScroll: function (e) {
                     localStorage.setItem('reader-scroll-top', e.target.scrollTop);
                 },
-                activeTab: function (index) {
-                    this.activeTabIndex = index;
-                },
                 updateItem: function () {
 
                     if (this.currentType == "Node") {
@@ -916,7 +910,7 @@
 
                 },
                 searchCategory(target) {
-                    this.activeTabIndex = 0;
+                    this.leftTabActive = "节点";
                     var { category } = target.dataset;
                     this.filterKey = "c:" + category;
                 },
@@ -983,7 +977,7 @@
                 contentHtml: '',
                 currentType: '', //Node、Edge
                 currentItem: {},
-                activeTabIndex: 0,
+                leftTabActive: "节点", //leftTab默认激活选项卡
                 showReader: true,
                 showSearch: true,
                 showAttr: true,
