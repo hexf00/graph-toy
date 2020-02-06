@@ -13,6 +13,7 @@ var importData = function (el) {
     reader.onload = function (e) {
         //更新数据
         graph.changeData(JSON.parse(this.result));
+        app.renderVisible();
     }
 }
 

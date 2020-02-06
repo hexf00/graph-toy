@@ -879,6 +879,17 @@
                     );
 
                     $("#content").html(html);
+ 
+                },
+                renderVisible(){
+                    //隐藏被隐藏的连线
+                    graph.getEdges().forEach((edge)=>{
+                        if(edge.getModel().visible === false){
+                            edge.hide();
+                        }
+                    })
+
+                    graph.refresh();
 
                 },
                 renderReader() {
@@ -995,6 +1006,7 @@
                 }
             },
             created() {
+                this.renderVisible();
                 this.renderReader();
             },
             data: {
