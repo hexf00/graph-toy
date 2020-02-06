@@ -144,7 +144,7 @@
         ul.tab-title li {
             display: inline-block;
             cursor: pointer;
-            padding:5px;
+            padding: 5px;
         }
 
         ul.tab-title li.active {
@@ -230,16 +230,18 @@
                                 name="category"></p>
                         <div>
                             <div>描述:</div>
-                            <textarea style="width: 98%;min-height: 150px;" type="text" v-model="currentItem.description"
-                                name="description"></textarea>
+                            <textarea style="width: 98%;min-height: 150px;" type="text"
+                                v-model="currentItem.description" name="description"></textarea>
                         </div>
                         <button type="button" @click="updateItem()">保存</button>
                         <ul v-if="currentType == 'Node'">
                             <li v-for="edge in currentItemEdges">
+                                <input type="checkbox" @click="changeEdgeVisible(edge, $event.target.checked)"
+                                    :checked="edge.visible !== false" />
                                 <span :class="{strong:currentItem.id !== edge.source}" :data-id="edge.source"
                                     :title="edge.sourceModel.category"
                                     @click="focus($event.target)">{{edge.sourceModel.label}}</span>
-                                =={{edge.label}}==>
+                                <span>=={{edge.label}}==></span>
                                 <span :class="{strong:currentItem.id !== edge.target}" :data-id="edge.target"
                                     :title="edge.sourceModel.category"
                                     @click="focus($event.target)">{{edge.targetModel.label}}</span>
@@ -771,6 +773,23 @@
 
             },
             methods: {
+                changeEdgeVisible(model, status) {
+                    var edge = graph.find('edge', (edge) => {
+                        var { source, target } = edge.getModel();
+                        return source == model.source && target == model.target
+                    })
+                    graph.updateItem(edge, {
+                        visible: status,
+                    })
+
+                    if (status) {
+                        edge.show()
+                    } else {
+                        edge.hide()
+                    }
+
+                    graph.refreshItem(edge)
+                },
                 readerScroll: function (e) {
                     localStorage.setItem('reader-scroll-top', e.target.scrollTop);
                 },
@@ -906,7 +925,7 @@
                     //渲染后更新滚动条位置
                     this.$nextTick(() => {
                         var scrollTop = localStorage.getItem('reader-scroll-top');
-                        if(scrollTop){
+                        if (scrollTop) {
                             this.$refs.readerContent.scrollTop = scrollTop
                         }
                     });
