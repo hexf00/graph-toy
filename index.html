@@ -179,6 +179,7 @@
 
             <set-category></set-category>
             <button onclick="hide()">隐藏边</button>
+            <button @click="showCategory(!showCategoryStatus)"> {{ showCategoryStatus ? "隐藏" : "显示"}}分类</button>
             <span>自动保存状态:{{saveTimeShowText}}</span>
         </div>
         <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
@@ -879,12 +880,12 @@
                     );
 
                     $("#content").html(html);
- 
+
                 },
-                renderVisible(){
+                renderVisible() {
                     //隐藏被隐藏的连线
-                    graph.getEdges().forEach((edge)=>{
-                        if(edge.getModel().visible === false){
+                    graph.getEdges().forEach((edge) => {
+                        if (edge.getModel().visible === false) {
                             edge.hide();
                         }
                     })
@@ -948,6 +949,34 @@
                     this.leftTabActive = "节点";
                     var { category } = target.dataset;
                     this.filterKey = "c:" + category;
+                },
+                showCategory(status) {
+                    //是否显示分类。
+                    var data = graph.save()
+
+                    data.nodes.forEach((node) => {
+                        if (!node.labelCfg) {
+                            node.labelCfg = {
+                            }
+                        }
+                        if (!node.labelCfg.style) {
+                            node.labelCfg.style = {
+                            }
+                        }
+                        if (status) {
+                            if (node.category) {
+                                node.labelCfg.style.text = `[${node.category}]${node.label}` //rect
+                            } else {
+                                delete node.labelCfg.style.text
+                            }
+                        } else {
+                            delete node.labelCfg.style.text
+                        }
+                    })
+
+                    this.showCategoryStatus = status
+
+                    graph.changeData(data)
                 },
                 focus: function (target) {
                     console.log(target, this);
@@ -1018,6 +1047,7 @@
                 showReader: true,
                 showSearch: true,
                 showAttr: true,
+                showCategoryStatus: false, //label显示分类
                 filterKey: "",
                 saveTime: "", //自动保存时间
                 saveTimeShowText: "无", //保存时间显示
