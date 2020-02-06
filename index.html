@@ -144,6 +144,7 @@
         ul.tab-title li {
             display: inline-block;
             cursor: pointer;
+            padding:5px;
         }
 
         ul.tab-title li.active {
@@ -215,36 +216,40 @@
 
             <div v-else>
                 <div><span style="float: right;" @click="showAttr=false">x</span></div>
-                <div>
-                    <p v-if="currentType == 'Node'">
-                        currentType:{{currentType}}
-                    </p>
-                    <p v-else>
-                        {{currentEdgeSource}} =={{currentItem.label}}==>
-                        {{currentEdgeTarget}}
-                    </p>
-                    <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
-                    <p v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category"
-                            name="category"></p>
-                    <div>
-                        <div>描述:</div>
-                        <textarea style="width: 98%;min-height: 150px;" type="text" v-model="currentItem.description"
-                            name="description"></textarea>
-                    </div>
-                    <button type="button" @click="updateItem()">保存</button>
-                    {{currentItem}}
-                    <ul v-if="currentType == 'Node'">
-                        <li v-for="edge in currentItemEdges">
-                            <span :class="{strong:currentItem.id !== edge.source}" :data-id="edge.source"
-                                :title="edge.sourceModel.category"
-                                @click="focus($event.target)">{{edge.sourceModel.label}}</span>
-                            =={{edge.label}}==>
-                            <span :class="{strong:currentItem.id !== edge.target}" :data-id="edge.target"
-                                :title="edge.sourceModel.category"
-                                @click="focus($event.target)">{{edge.targetModel.label}}</span>
-                        </li>
-                    </ul>
-                </div>
+                <tab v-model="rightTabActve">
+                    <panel title="属性">
+                        <p v-if="currentType == 'Node'">
+                            currentType:{{currentType}}
+                        </p>
+                        <p v-else>
+                            {{currentEdgeSource}} =={{currentItem.label}}==>
+                            {{currentEdgeTarget}}
+                        </p>
+                        <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
+                        <p v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category"
+                                name="category"></p>
+                        <div>
+                            <div>描述:</div>
+                            <textarea style="width: 98%;min-height: 150px;" type="text" v-model="currentItem.description"
+                                name="description"></textarea>
+                        </div>
+                        <button type="button" @click="updateItem()">保存</button>
+                        <ul v-if="currentType == 'Node'">
+                            <li v-for="edge in currentItemEdges">
+                                <span :class="{strong:currentItem.id !== edge.source}" :data-id="edge.source"
+                                    :title="edge.sourceModel.category"
+                                    @click="focus($event.target)">{{edge.sourceModel.label}}</span>
+                                =={{edge.label}}==>
+                                <span :class="{strong:currentItem.id !== edge.target}" :data-id="edge.target"
+                                    :title="edge.sourceModel.category"
+                                    @click="focus($event.target)">{{edge.targetModel.label}}</span>
+                            </li>
+                        </ul>
+                    </panel>
+                    <panel title="JSON">
+                        <pre v-html="JSON.stringify(currentItem,null,2)"></pre>
+                    </panel>
+                </tab>
             </div>
 
         </div>
@@ -978,6 +983,7 @@
                 currentType: '', //Node、Edge
                 currentItem: {},
                 leftTabActive: "节点", //leftTab默认激活选项卡
+                rightTabActve: "属性",//rightTab默认激活选项卡
                 showReader: true,
                 showSearch: true,
                 showAttr: true,
