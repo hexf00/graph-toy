@@ -176,23 +176,43 @@ G6.registerBehavior('custom-drag-node', {
         //上面代码是用来改变位置的
         //如果是建立关联，我们是不需要改变位置的
 
+        // console.log(this.targetId, this.targets, this.target)
+        //this.targetId 松开鼠标时的节点ID
+        //this.targets 选中节点
+        //this.target 没有选中节点时，松开鼠标时的节点
 
+        // this.targets 和 this.target是二选一模式
         if (this.targetId) {
-            // console.log(this.targets)
 
+            var findEdge = (model) => {
+                return graph.find('edge', (edge) => {
+                    var { source, target } = edge.getModel();
+                    return source == model.source && target == model.target
+                })
+            }
 
+            //创建
+            var addEdgeUnique = (model) => {
+                if (!findEdge(model)) {
+                    graph.addItem('edge', {
+                        source: model.source,
+                        target: model.target
+                    })
+                }
+            }
 
 
             if (this.targets.length > 0) {
+                //有选中节点时
 
 
                 //如果目标ID是已经选择的目标则放弃此次操作
                 if (!this.targets.find(node => node.getModel().id == this.targetId)) {
                     this.targets.forEach(node => {
-                        graph.addItem('edge', {
+                        addEdgeUnique({
                             source: node.getModel().id,
                             target: this.targetId
-                        })
+                        });
                     });
                 }
 
@@ -200,11 +220,17 @@ G6.registerBehavior('custom-drag-node', {
 
 
             } else if (this.target) {
+                //无选中节点
 
-                graph.addItem('edge', {
-                    source: this.target.getModel().id,
-                    target: this.targetId
-                })
+                //避免自连接
+                if (this.target.getModel().id != this.targetId) {
+
+
+                    addEdgeUnique({
+                        source: this.target.getModel().id,
+                        target: this.targetId
+                    });
+                }
             }
 
 
