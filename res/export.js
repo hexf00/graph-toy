@@ -15,6 +15,10 @@ var exportData = function () {
 
     var data = graph.save()
 
+    data.nodes.forEach((item,i)=>{
+        delete data.nodes[i].labelCfg
+    })
+
     var filename = "graph-toy.export.json";
     if (data.nodes.length > 0) {
         filename = data.nodes[0].label + ".export.json";
