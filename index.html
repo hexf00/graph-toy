@@ -29,12 +29,12 @@
     <script src="res/node-dblclick-edit.js"></script>
     <script src="res/shortcut-keys.js"></script>
     <script src="res/dblclick-new.js"></script>
-    
+
     <!-- vue -->
     <script src="res/component/set-category.js"></script>
     <script src="res/component/tab/tab.js"></script>
     <script src="res/component/tab/panel.js"></script>
-    
+
     <link rel="stylesheet" href="https://cdn.staticfile.org/normalize/8.0.1/normalize.css">
     <link rel="stylesheet" href="res/css/reader.css">
     <style>
@@ -678,7 +678,7 @@
                 },
                 currentItemEdges() {
                     if (this.currentType == "Node") {
-                        
+
                         var data = graph.save();
                         // return graph.findById(this.currentItem.target).getModel().label
                         var result = data.edges.filter((edge) => {
@@ -800,18 +800,31 @@
                 readerScroll: function (e) {
                     localStorage.setItem('reader-scroll-top', e.target.scrollTop);
                 },
+                //将属性面板数据更新到图中
                 updateItem: function () {
 
                     if (this.currentType == "Node") {
 
                         var item = graph.findById(this.currentItem.id);
                         //item.update 不会触发g6事件 改为 graph.updateItem
-                        graph.updateItem(item, {
+
+                        var updateModel = {
                             // id: this.currentItem.id,
                             description: this.currentItem.description,
                             category: this.currentItem.category,
                             label: this.currentItem.label
-                        })
+                        };
+
+                        //显示分类
+                        if (this.showCategoryStatus) {
+                            updateModel.labelCfg = {
+                                style: {
+                                    text: `[${updateModel.category}]${updateModel.label}`
+                                }
+                            }
+                        }
+
+                        graph.updateItem(item, updateModel)
 
                         graph.refreshItem(item)
                     } else {
