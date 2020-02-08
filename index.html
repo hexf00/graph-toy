@@ -678,8 +678,10 @@
                 },
                 currentItemEdges() {
                     if (this.currentType == "Node") {
+                        
+                        var data = graph.save();
                         // return graph.findById(this.currentItem.target).getModel().label
-                        var result = this.graphData.edges.filter((edge) => {
+                        var result = data.edges.filter((edge) => {
                             const sourceId = edge.source;
                             const targetId = edge.target;
 
