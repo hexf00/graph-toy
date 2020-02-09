@@ -32,6 +32,7 @@
 
     <!-- vue -->
     <script src="res/component/set-category.js"></script>
+    <script src="res/component/node-detail.js"></script>
     <script src="res/component/tab/tab.js"></script>
     <script src="res/component/tab/panel.js"></script>
 
@@ -158,6 +159,14 @@
         span.strong {
             font-weight: bold;
         }
+        .node-detail{
+            position: fixed;
+            background: #eee;
+            padding: 10px;
+            border: #545454 1px solid;
+            width: 500px;
+            z-index: 999999;
+        }
     </style>
     <style>
         .g6-tooltip {
@@ -277,7 +286,7 @@
             <div id="content" ref="readerContent" class="content" @scroll="readerScroll" @mouseup="getSelection"
                 v-html="contentHtml"></div>
         </div>
-
+        <node-detail :node="hoverNode" :x="hoverX" :y="hoverY"></node-detail>
     </div>
 
     <div class="menu">
@@ -955,6 +964,22 @@
 
                     //渲染后更新滚动条位置
                     this.$nextTick(() => {
+
+                        $("#content").unbind("mouseover").unbind("mouseout")
+                            .on("mouseover", "span", (e) => {
+                                let nodeId = e.target.dataset.id
+                                if(nodeId){
+                                    let node = graph.findById(nodeId);
+                                    app.hoverNode = node.getModel();
+                                    app.hoverX = e.target.clientX;
+                                    app.hoverY = e.target.clientY;
+                                }
+                                // console.log("mouseover", e);
+                            }).on("mouseout", "span", (e) => {
+                                app.hoverNode = null;
+                                app.hoverX = null;
+                                app.hoverY = null;
+                            })
                         var scrollTop = localStorage.getItem('reader-scroll-top');
                         if (scrollTop) {
                             this.$refs.readerContent.scrollTop = scrollTop
@@ -1063,6 +1088,9 @@
                 currentItem: {},
                 leftTabActive: "节点", //leftTab默认激活选项卡
                 rightTabActve: "属性",//rightTab默认激活选项卡
+                hoverNode: null,//阅读器悬浮节点
+                hoverX:0,
+                hoverY:0,
                 showReader: true,
                 showSearch: true,
                 showAttr: true,
