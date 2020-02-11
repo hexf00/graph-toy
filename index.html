@@ -241,7 +241,15 @@
                         </p>
                         <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
                         <p v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category"
-                                name="category"></p>
+                            name="category"></p>
+                        <p v-if="currentType == 'Node'">类型：
+                            <select v-model="currentItem.type">
+                                <option value="">无</option>
+                                <option value="word">词语</option>
+                                <option value="entity">实体</option>
+                                <option value="class">类</option>
+                            </select>
+                        </p>
                         <div>
                             <div>描述:</div>
                             <textarea style="width: 98%;min-height: 150px;" type="text"
