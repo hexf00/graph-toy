@@ -532,7 +532,9 @@
         var graphUpdate = _.throttle(function (event, args) {
             console.log("graphUpdate 触发");
             needAutoSaveStatus = true; //需要保存
-            app.$set(app.graphData, 'nodes', graph.save().nodes);
+            if (app) {
+                app.$set(app.graphData, 'nodes', graph.save().nodes);
+            }
         }, 100, {
             leading: false,
             trailing: true //节流结束后执行
@@ -682,7 +684,7 @@
     <script>
         var labelFill = {
             word: '#fdf72f',//黄色
-            entity: '#6067d9',//蓝色
+            entity: '#9ba0ff',//蓝色
             class: '#ce621d',//橙色
         }
         //代码参考cn.vuejs.org/v2/examples/grid-component.html
@@ -840,9 +842,9 @@
                         };
 
                         if (this.currentItem.type) {
-                            updateModel.style = {
+                            updateModel.style = Object.assign({
                                 fill: labelFill[this.currentItem.type]
-                            }
+                            }, updateModel.style)
                         }
 
                         //显示分类
@@ -1102,12 +1104,13 @@
                     var data = graph.save()
                     data.nodes = data.nodes.map((node) => {
                         if (node.type) {
-                            node.style = Object.assign({
-                                fill: labelFill[this.currentItem.type]
-                            }, node.style)
+                            node.style = Object.assign({}, node.style, {
+                                fill: labelFill[node.type]
+                            })
                         }
                         return node
                     })
+
                     graph.changeData(data);
                 },
             },
