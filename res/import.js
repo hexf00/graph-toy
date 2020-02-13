@@ -14,6 +14,7 @@ var importData = function (el) {
         //更新数据
         graph.changeData(JSON.parse(this.result));
         app.renderVisible();
+        app.renderTypeStyle();//渲染Type颜色
     }
 }
 

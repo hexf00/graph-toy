@@ -159,7 +159,8 @@
         span.strong {
             font-weight: bold;
         }
-        .node-detail{
+
+        .node-detail {
             position: fixed;
             background: #eee;
             padding: 10px;
@@ -241,7 +242,7 @@
                         </p>
                         <p>label：<input type="text" v-model="currentItem.label" name="label"></p>
                         <p v-if="currentType == 'Node'">分类：<input type="text" v-model="currentItem.category"
-                            name="category"></p>
+                                name="category"></p>
                         <p v-if="currentType == 'Node'">类型：
                             <select v-model="currentItem.type">
                                 <option value="">无</option>
@@ -679,6 +680,11 @@
     </script>
 
     <script>
+        var labelFill = {
+            word: '#fdf72f',//黄色
+            entity: '#6067d9',//蓝色
+            class: '#ce621d',//橙色
+        }
         //代码参考cn.vuejs.org/v2/examples/grid-component.html
         var app = new Vue({
             el: '#app',
@@ -827,10 +833,17 @@
 
                         var updateModel = {
                             // id: this.currentItem.id,
+                            type: this.currentItem.type, //节点类型
                             description: this.currentItem.description,
                             category: this.currentItem.category,
-                            label: this.currentItem.label
+                            label: this.currentItem.label,
                         };
+
+                        if (this.currentItem.type) {
+                            updateModel.style = {
+                                fill: labelFill[this.currentItem.type]
+                            }
+                        }
 
                         //显示分类
                         if (this.showCategoryStatus) {
@@ -976,7 +989,7 @@
                         $("#content").unbind("mouseover").unbind("mouseout")
                             .on("mouseover", "span", (e) => {
                                 let nodeId = e.target.dataset.id
-                                if(nodeId){
+                                if (nodeId) {
                                     let node = graph.findById(nodeId);
                                     app.hoverNode = node.getModel();
                                     app.hoverX = e.target.clientX;
@@ -1084,9 +1097,22 @@
                     }, 300, 'easeCubic');
 
                     console.log(this, id)
-                }
+                },
+                renderTypeStyle() {
+                    var data = graph.save()
+                    data.nodes = data.nodes.map((node) => {
+                        if (node.type) {
+                            node.style = Object.assign({
+                                fill: labelFill[this.currentItem.type]
+                            }, node.style)
+                        }
+                        return node
+                    })
+                    graph.changeData(data);
+                },
             },
             created() {
+                this.renderTypeStyle();//渲染Type颜色
                 this.renderVisible();
                 this.renderReader();
             },
@@ -1097,8 +1123,8 @@
                 leftTabActive: "节点", //leftTab默认激活选项卡
                 rightTabActve: "属性",//rightTab默认激活选项卡
                 hoverNode: null,//阅读器悬浮节点
-                hoverX:0,
-                hoverY:0,
+                hoverX: 0,
+                hoverY: 0,
                 showReader: true,
                 showSearch: true,
                 showAttr: true,
