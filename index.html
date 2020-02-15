@@ -206,12 +206,11 @@
         }
 
         //载入缓存
-        localStorage.setItem("auto-save-data-key", "auto-save-data");
+        
         var data = { "nodes": [], "edges": [] }
         try {
-            var key = localStorage.getItem("auto-save-data-key");
-            var rawData = localStorage.getItem(key);
-            if (key && rawData) {
+            var rawData = localStorage.getItem("auto-save-data");
+            if (rawData) {
                 data = JSON.parse(rawData);
             }
         } catch (e) {
@@ -225,13 +224,11 @@
             if (needAutoSaveStatus) {
 
                 console.log("触发自动保存");
-                // localStorage.setItem();
 
                 var root = graph.save().nodes[0].label;
                 var saveIndexData = [];
 
-                var key = localStorage.getItem("auto-save-data-key");
-                localStorage.setItem(key, JSON.stringify(graph.save()));
+                localStorage.setItem("auto-save-data", JSON.stringify(graph.save()));
                 exportData(); //调用下载自动保存
 
                 app.saveTime = new Date();
