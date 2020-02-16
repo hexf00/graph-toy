@@ -24,10 +24,10 @@
 
 
     <!-- G6 behavior -->
-    <script src="res/node-click.js"></script>
-    <script src="res/custom-drag-node.js"></script>
-    <script src="res/shortcut-keys.js"></script>
-    <script src="res/dblclick-new.js"></script>
+    <script src="res/g6-behaviors/node-click.js"></script>
+    <script src="res/g6-behaviors/custom-drag-node.js"></script>
+    <script src="res/g6-behaviors/shortcut-keys.js"></script>
+    <script src="res/g6-behaviors/dblclick-new.js"></script>
 
     <!-- vue -->
     <script src="res/component/set-category.js"></script>
@@ -205,7 +205,7 @@
         }
 
         //载入缓存
-        
+
         var data = { "nodes": [], "edges": [] }
         try {
             var rawData = localStorage.getItem("auto-save-data");
