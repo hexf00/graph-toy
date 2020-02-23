@@ -83,8 +83,8 @@ G6.registerBehavior('shortcut-keys', {
                 this.graph.addItem('edge', newEdge);
             }
 
-            if (typeof dataLayer !== undefined) {
-                dataLayer.scheduler.emit('batch', [
+            if (graph.get('dataLayer')) {
+                graph.get('dataLayer').scheduler.emit('batch', [
                     {
                         type: 'node',
                         action: 'insert',

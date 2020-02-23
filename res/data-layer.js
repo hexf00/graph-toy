@@ -1,13 +1,12 @@
 
 // 使用数据层统一多个G6实例的数据
 
-// 好处：只存储和关注关键数据的改动，无需做转换
+// 好处：数据以数据层为准，只存储和关注关键数据的改动，导出时无需做转换
 //    如G6中会添加一些位置和样式信息，edge.startPoint/endPoint 可以根据关系计算出来，一些样式信息不存储
 
 var DataLayer = function (data) {
   let dataLayer = this
   this.data = data
-  this.graphs = []
 
   // commands 
   // {type:node/edge, action:insert/delete/update, id:'', where:[], model:{}}
@@ -43,15 +42,3 @@ DataLayer.prototype.addItem = function (command) {
   })
 }
 
-// 注册G6实例
-DataLayer.prototype.addGraph = function (graph) {
-  this.graphs.push(graph)
-}
-
-// 注销G6实例
-DataLayer.prototype.removeGraph = function (graph) {
-  var graphIndex = this.graphs.indexOf(graph)
-  if (graphIndex !== -1) {
-    this.graphs.splice(graphIndex, 1)
-  }
-}

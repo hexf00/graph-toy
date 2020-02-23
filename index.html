@@ -320,12 +320,10 @@
                     stroke: '#f00'
                 }
             },
-
+            dataLayer: dataLayer, //绑定数据层实例
             animate: true            // Boolean，可选，切换布局时是否使用动画过度
         });
 
-        //将画布注册到数据层
-        dataLayer.addGraph(graph)
 
         // 监听鼠标进入节点
         graph.on('node:mouseenter', e => {
