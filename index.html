@@ -246,8 +246,7 @@
         // 使用数据层确保数据的唯一准确性
         var dataLayer = new DataLayer(data);
 
-        dataLayer.on("bacth", (commands) => {
-            //
+        dataLayer.on("batch", (commands) => {
             console.log("数据层更新成功", commands)
         })
 
