@@ -13,6 +13,7 @@
     <script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.staticfile.org/moment.js/2.24.0/moment.js"></script>
     <script src="https://cdn.staticfile.org/moment.js/2.24.0/locale/zh-cn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uuid@7.0.0-beta.0/dist/umd/uuidv4.min.js"></script>
 
 
     <!-- func -->
@@ -21,6 +22,7 @@
     <script src="res/export.js"></script>
     <script src="res/import.js"></script>
     <script src="res/data-check.js"></script>
+    <script src="res/data-layer.js"></script>
 
 
     <!-- G6 behavior -->
@@ -239,6 +241,24 @@
         })
         console.log(JSON.stringify(data.edges));
 
+
+        
+        // 使用数据层确保数据的唯一准确性
+        var dataLayer = new DataLayer(data);
+
+        // g6操作通知数据层进行数据层数据更新，更新成功后通知g6进行数据更新
+        // 考虑到性能，需要将多个操作一起打包
+        // 多个操作打包需要考虑到中途可能失败，需要事务失败需要进行回滚，更合理的选择应该是使用数据库
+     
+
+        // 数据层通知g6进行数据更新，一个画布一个监听器实例
+        // 直接调用g6进行绘制即可
+        // var g6Scheduler = new Scheduler();
+
+
+
+        console.log(dataLayer);
+
         const graph = new G6.Graph({
             container: 'mountNode',  // String | HTMLElement，必须，容器 id 或容器本身
             width: Math.floor($('#mountNode').width()),              // Number，必须，图的宽度
@@ -303,6 +323,9 @@
 
             animate: true            // Boolean，可选，切换布局时是否使用动画过度
         });
+
+        //将画布注册到数据层
+        dataLayer.addGraph(graph)
 
         // 监听鼠标进入节点
         graph.on('node:mouseenter', e => {

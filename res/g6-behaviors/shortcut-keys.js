@@ -61,30 +61,49 @@ G6.registerBehavior('shortcut-keys', {
         const nodes = graph.findAllByState('node', 'selected');
 
         if (nodes.length) {
-            var addNode = () => {
-                var id = new Date().getTime() + parseInt(Math.random() * 1000).toString();
 
-
-                //因为需要手动指定x,y 无法调用布局方法
-
-                graph.addItem('node', {
-                    id: id,
-                    realId: id,
-                    label: '新节点',
-                    x: nodes[0].getModel().x + 100,
-                    y: nodes[0].getModel().y
-                })
-                //该方式加入的节点必须要传入x/y ，并且调用graph.layout()并不会重新布局
-
-                return id;
+            //构建数据
+            var newNodeId = uuidv4();
+            var newNode = {
+                id: newNodeId,
+                realId: newNodeId,
+                label: '新节点',
+                x: nodes[0].getModel().x + 100,
+                y: nodes[0].getModel().y
+            }
+            var newEdge = {
+                id: uuidv4(),
+                source: nodes[0].getModel().id,
+                target: newNode.id
             }
 
-            var id = addNode();
+            //构建动作
+            var graphAction = () => {
+                this.graph.addItem('node', newNode);
+                this.graph.addItem('edge', newEdge);
+            }
 
-            graph.addItem('edge', {
-                source: nodes[0].getModel().id,
-                target: id
-            });
+            if (typeof dataLayer !== undefined) {
+                dataLayer.scheduler.emit('batch', [
+                    {
+                        type: 'node',
+                        action: 'insert',
+                        model: newNode
+                    },
+                    {
+                        type: 'edge',
+                        action: 'insert',
+                        model: newEdge
+                    },
+                ]).then(graphAction).catch((err) => {
+                    //终止链
+                    console.error("g6 新增节点 时出错")
+                })
+            } else {
+                //没有数据层的情况
+                graphAction()
+            }
+
 
 
 
