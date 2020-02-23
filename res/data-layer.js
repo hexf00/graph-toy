@@ -5,33 +5,33 @@
 //    如G6中会添加一些位置和样式信息，edge.startPoint/endPoint 可以根据关系计算出来，一些样式信息不存储
 
 var DataLayer = function (data) {
-  let dataLayer = this
   this.data = data
 
-  // commands 
-  // {type:node/edge, action:insert/delete/update, id:'', where:[], model:{}}
 
-  //其实也可以不使用scheduler，做成函数直接调用DataLayer的方法也是一样的，且可以拿到返回值
   this.scheduler = new Scheduler()
-    .on('batch', function (commands) {
-      var actions = [];
-      commands.forEach(command => {
-        if (command.action == "insert") {
-          actions.push(dataLayer.addItem(command))
-        }
-      })
+  //在外部监听，使用场景：1可以实现数据变动时数据自动保存到磁盘、2写操作日志等、3通知其它实例进行更新数据等
+  this.on = this.scheduler.on.bind(this.scheduler)
+}
 
-      return Promise.all(actions).catch((e) => {
-        console.error("数据层 insert 时出错")
-        return Promise.reject(e)
-      })
-    }).on('update', function () {
+/**
+ * @param commands {type:node/edge, action:insert/delete/update, id:'', where:[], model:{}}
+ */
+DataLayer.prototype.batch = function (commands) {
 
-    }).on('delete', function () {
 
-    }).on('insert', function () {
+  var actions = [];
+  commands.forEach(command => {
+    if (command.action == "insert") {
+      actions.push(this.addItem(command))
+    }
+  })
 
-    })
+  return Promise.all(actions).then(() => {
+    this.scheduler.emit("batch", commands)
+  }).catch((e) => {
+    console.error("数据层 insert 时出错")
+    return Promise.reject(e)
+  })
 }
 
 DataLayer.prototype.addItem = function (command) {

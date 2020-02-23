@@ -84,7 +84,7 @@ G6.registerBehavior('shortcut-keys', {
             }
 
             if (graph.get('dataLayer')) {
-                graph.get('dataLayer').scheduler.emit('batch', [
+                graph.get('dataLayer').batch([
                     {
                         type: 'node',
                         action: 'insert',
