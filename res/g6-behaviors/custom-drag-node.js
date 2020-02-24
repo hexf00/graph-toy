@@ -174,78 +174,48 @@ G6.registerBehavior('custom-drag-node', {
 
 
 
-        //上面代码是用来改变位置的
-        //如果是建立关联，我们是不需要改变位置的
-
-        // console.log(this.targetId, this.targets, this.target)
-        //this.targetId 松开鼠标时的节点ID，在鼠标事件中获取
-        //this.targets 选中节点，即拖拽的拖个节点
-        //this.target 没有选中节点时，松开鼠标时的节点，即拖拽的单个节点，在开始拖拽事件获取
-
-        // this.targets 和 this.target是二选一模式
-
-        let dragNodes = []
+        let targetId = this.targetId //onMouseEnter中定义
+        let dragNodes = [] //onDragStart中定义
         if (this.targets.length > 0) {
-            //多选情况，获取所有已经选中的节点，排除了锁定的节点
+            //拖拽选中节点的情况，获取所有已经选中的节点，排除了锁定的节点
             dragNodes = this.targets
         } else if (this.target) {
-            //未选中情况，开始拖拽时光标处的节点
+            //被拖拽节点非选中节点
             dragNodes = [this.target]
         }
 
-        if (this.targetId) {
+        if (targetId) {
             //希望建立连线
 
-            var findEdge = (model) => {
-                return graph.find('edge', (edge) => {
-                    var { source, target } = edge.getModel();
-                    return source == model.source && target == model.target
-                })
-            }
+            //规则1：如果拖拽结束时位于拖拽中节点的位置上，即目标节点在源节点集合中，可能是误操作
+            // 可以在拖拽的时候改变鼠标光标加以明示，则不操作，也即是节点不能连接自身 
+            //规则2：两个节点之间同一个方向的连线只能存在一个，即同方向的连线不能重复，暂且这么规定
 
-            //创建
-            var addEdgeUnique = (model) => {
-                if (!findEdge(model)) {
-                    graph.addItem('edge', {
-                        source: model.source,
-                        target: model.target
+            if (!dragNodes.find(node => node.get('id') === targetId)) {
+                var targetNode = graph.findById(targetId);
+                var existingEdges = targetNode.getEdges().map(it => it.getModel())
+                var commands = dragNodes.filter(node => {
+                    return !existingEdges.find(edge => {
+                        return node.get('id') === edge.source && targetId === edge.target
+                    })
+                }).map(node => {
+                    return {
+                        type: "edge",
+                        action: "insert",
+                        model: {
+                            id: uuidv4(),
+                            source: node.get('id'),
+                            target: targetId
+                        }
+                    }
+                })
+
+                if (commands.length > 0) {
+                    graph.get('dataLayer').batch(commands).catch((err) => {
+                        console.error("g6 拖拽建立连接 时出错")
                     })
                 }
             }
-
-
-            if (this.targets.length > 0) {
-                //有选中节点时
-
-
-                //如果目标ID是已经选择的目标则放弃此次操作
-                if (!this.targets.find(node => node.getModel().id == this.targetId)) {
-                    this.targets.forEach(node => {
-                        addEdgeUnique({
-                            source: node.getModel().id,
-                            target: this.targetId
-                        });
-                    });
-                }
-
-
-
-
-            } else if (this.target) {
-                //无选中节点
-
-                //避免自连接
-                if (this.target.getModel().id != this.targetId) {
-
-
-                    addEdgeUnique({
-                        source: this.target.getModel().id,
-                        target: this.targetId
-                    });
-                }
-            }
-
-
         } else {
             //希望移动
             if (graph.get('dataLayer')) {

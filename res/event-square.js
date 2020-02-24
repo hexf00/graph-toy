@@ -14,20 +14,28 @@ var EventSquare = function (producer) {
 
     this.producer.on("batch", (commands) => {
         this.consumers.forEach((consumer) => {
+            var graph = consumer;
+
+            const autoPaint = graph.get('autoPaint');
+            graph.setAutoPaint(false);
+
             commands.forEach((command) => {
                 if (command.action == "insert") {
-                    consumer.addItem(command.type, command.model)
+                    graph.addItem(command.type, command.model)
                 } else if (command.action == "delete") {
-                    consumer.removeItem(consumer.findById(command.id))
+                    graph.removeItem(graph.findById(command.id))
                 } else if (command.action == "update") {
-                    consumer.updateItem(consumer.findById(command.id), command.model)
+                    graph.updateItem(graph.findById(command.id), command.model)
                 } else {
                     console.error("未知command类型", command)
                 }
             })
+
+            graph.paint();
+            graph.setAutoPaint(autoPaint);
         })
         return commands
-    }).on("batch",(commands)=>{
+    }).on("batch", (commands) => {
         console.log(`操作更新了${commands.length}条数据，注意及时保存。`)
     })
 
