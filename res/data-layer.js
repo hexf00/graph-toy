@@ -3,6 +3,7 @@
 
 // 好处：数据以数据层为准，只存储和关注关键数据的改动，导出时无需做转换
 //    如G6中会添加一些位置和样式信息，edge.startPoint/endPoint 可以根据关系计算出来，一些样式信息不存储
+//  定位：只存储对数据的操作，不涉及具体实例的如何操作改变，以事件的形式通知
 
 var DataLayer = function (data) {
   this.data = data
@@ -29,7 +30,7 @@ DataLayer.prototype.batch = function (commands) {
   return Promise.all(actions).then(() => {
     this.scheduler.emit("batch", commands)
   }).catch((e) => {
-    console.error("数据层 insert 时出错")
+    console.error("数据层 insert 时出错", e)
     return Promise.reject(e)
   })
 }

@@ -95,7 +95,9 @@ G6.registerBehavior('shortcut-keys', {
                         action: 'insert',
                         model: newEdge
                     },
-                ]).then(graphAction).catch((err) => {
+                ])
+                // .then(graphAction) //对画布的操作在事件广场进行
+                .catch((err) => {
                     //终止链
                     console.error("g6 新增节点 时出错")
                 })
