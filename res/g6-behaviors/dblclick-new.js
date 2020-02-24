@@ -11,16 +11,35 @@ G6.registerBehavior('dblclick-new', {
         }
         const { item } = e;
         const graph = this.graph;
-        var id = new Date().getTime() + parseInt(Math.random() * 1000).toString();
 
-        graph.addItem('node', {
-            id: id,
-            realId: id,
-            label: "新节点",
+
+        //构建数据
+        var newNodeId = uuidv4();
+        var newNode = {
+            id: newNodeId,
+            realId: newNodeId,
+            label: '新节点',
             x: e.x,
             y: e.y
-        })
+        }
 
-        //addItem方法不会重新布局，应该要提供x,y信息
+        if (graph.get('dataLayer')) {
+            graph.get('dataLayer').batch([
+                {
+                    type: 'node',
+                    action: 'insert',
+                    model: newNode
+                }
+            ])
+                // .then(graphAction) //对画布的操作在事件广场进行
+                .catch((err) => {
+                    //终止链
+                    console.error("g6 双击新增节点 时出错")
+                })
+        } else {
+            graph.addItem(newNode)
+        }
+
+
     },
 });
