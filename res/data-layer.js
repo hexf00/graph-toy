@@ -111,4 +111,3 @@ DataLayer.prototype.deleteItem = function (command) {
     resolve(command)
   })
 }
-

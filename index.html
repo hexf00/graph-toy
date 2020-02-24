@@ -19,11 +19,11 @@
     <!-- func -->
     <script src="res/mark.js"></script>
     <script src="res/libs/Scheduler.js"></script>
-    <script src="res/export.js"></script>
     <script src="res/import.js"></script>
     <script src="res/data-check.js"></script>
     <script src="res/data-layer.js"></script>
     <script src="res/event-square.js"></script>
+    <script src="res/save-manager.js"></script>
 
 
     <!-- G6 behavior -->
@@ -49,12 +49,12 @@
             <button onclick="$('#fileSelect').click()">导入</button>
             <input type="file" onchange="importData(this)" name="" id="fileSelect" style="width:0px;height:1px;">
 
-            <button onclick="exportData()">导出</button>
+            <button onclick="saveManager.exportData()">导出</button>
 
             <set-category></set-category>
             <button onclick="hide()">隐藏边</button>
             <button @click="showCategory(!showCategoryStatus)"> {{ showCategoryStatus ? "隐藏" : "显示"}}分类</button>
-            <span>自动保存状态:{{saveTimeShowText}}</span>
+            <span>未导出改动:{{saveManager.changeCount}}</span>
         </div>
         <div v-if="!showSearch" class="left-bar" @click="showSearch=true">+</div>
         <div v-else class="tab left-bar">
@@ -201,52 +201,14 @@
         }
 
 
-        //needAutoSaveStatus 用来判断是否需要保存
-        var needAutoSaveStatus = false;
-        setInterval(function () {
-            if (needAutoSaveStatus) {
 
-                console.log("触发自动保存");
-
-                var root = graph.save().nodes[0].label;
-                var saveIndexData = [];
-
-                localStorage.setItem("auto-save-data", JSON.stringify(graph.save()));
-                exportData(); //调用下载自动保存
-
-                app.saveTime = new Date();
-
-                needAutoSaveStatus = false; //更新保存状态
-            }
-        }, 5000); //5s尝试保存一次
-
-
-        //1s更新显示保存时间
-        setInterval(function () {
-            if (app) {
-                if (app.saveTime) {
-                    if (moment().diff(app.saveTime, 'seconds') < 44) {
-                        app.saveTimeShowText = moment().diff(app.saveTime, 'seconds') + "秒前";
-                    } else {
-                        app.saveTimeShowText = moment(app.saveTime).fromNow();
-
-                    }
-                }
-            }
-        }, 1000)
-
-        data.edges = data.edges.map((edge) => {
-            edge.style.endArrow = true
-            // edge.style.startArrow = true
-            return edge
-        })
-        console.log(JSON.stringify(data.edges));
 
 
 
         // 使用数据层确保数据的唯一准确性
         var dataLayer = new DataLayer(data);
         var eventSquare = new EventSquare(dataLayer);
+        var saveManager = new SaveManager(dataLayer);
 
         // g6操作通知数据层进行数据层数据更新，更新成功后通知g6进行数据更新
         // 考虑到性能，需要将多个操作一起打包
@@ -299,7 +261,7 @@
             defaultEdge: {
                 style: {
                     endArrow: true,
-                    lineWidth: 3
+                    lineWidth: 2
                 }
             },
             nodeStateStyles: {
@@ -390,24 +352,19 @@
             $('.menu').hide();
         });
 
-        // 读取数据和渲染
-        graph.data(data);
+
+        // 不能让g6实例污染数据层的数据
+        var g6Data = JSON.parse(JSON.stringify(dataLayer.data));
+        // 对G6数据添加预处理
+        g6Data.edges.forEach((edge) => {
+            edge.style = {
+                endArrow: true,
+                lineWidth: 2
+            }
+        })
+
+        graph.data(g6Data);
         graph.render();
-
-        // var graphUpdate = _.throttle(function (event, args) {
-        //     console.log("graphUpdate 触发");
-        //     needAutoSaveStatus = true; //需要保存
-        //     if (app) {
-        //         app.$set(app.graphData, 'nodes', graph.save().nodes);
-        //     }
-        // }, 100, {
-        //     leading: false,
-        //     trailing: true //节流结束后执行
-        // })
-
-        // graph.on("afteradditem", function () { graphUpdate.call(this, 'afteradditem', arguments) })
-        // graph.on("afterremoveitem", function () { graphUpdate.call(this, 'afterremoveitem', arguments) })
-        // graph.on("afterupdateitem", function () { graphUpdate.call(this, 'afterupdateitem', arguments) })
     </script>
 
     <script>
@@ -1001,6 +958,7 @@
                 saveTime: "", //自动保存时间
                 saveTimeShowText: "无", //保存时间显示
                 graphData: graph.save(),
+                saveManager: saveManager
                 // nodes: graph.save().nodes,
             }
         })

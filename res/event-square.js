@@ -21,7 +21,7 @@ var EventSquare = function (producer) {
 
             commands.forEach((command) => {
                 if (command.action == "insert") {
-                    graph.addItem(command.type, command.model)
+                    graph.addItem(command.type, Object.assign({}, command.model))
                 } else if (command.action == "delete") {
                     graph.removeItem(graph.findById(command.id))
                 } else if (command.action == "update") {
