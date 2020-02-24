@@ -394,20 +394,20 @@
         graph.data(data);
         graph.render();
 
-        var graphUpdate = _.throttle(function (event, args) {
-            console.log("graphUpdate 触发");
-            needAutoSaveStatus = true; //需要保存
-            if (app) {
-                app.$set(app.graphData, 'nodes', graph.save().nodes);
-            }
-        }, 100, {
-            leading: false,
-            trailing: true //节流结束后执行
-        })
+        // var graphUpdate = _.throttle(function (event, args) {
+        //     console.log("graphUpdate 触发");
+        //     needAutoSaveStatus = true; //需要保存
+        //     if (app) {
+        //         app.$set(app.graphData, 'nodes', graph.save().nodes);
+        //     }
+        // }, 100, {
+        //     leading: false,
+        //     trailing: true //节流结束后执行
+        // })
 
-        graph.on("afteradditem", function () { graphUpdate.call(this, 'afteradditem', arguments) })
-        graph.on("afterremoveitem", function () { graphUpdate.call(this, 'afterremoveitem', arguments) })
-        graph.on("afterupdateitem", function () { graphUpdate.call(this, 'afterupdateitem', arguments) })
+        // graph.on("afteradditem", function () { graphUpdate.call(this, 'afteradditem', arguments) })
+        // graph.on("afterremoveitem", function () { graphUpdate.call(this, 'afterremoveitem', arguments) })
+        // graph.on("afterupdateitem", function () { graphUpdate.call(this, 'afterupdateitem', arguments) })
     </script>
 
     <script>

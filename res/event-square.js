@@ -19,12 +19,16 @@ var EventSquare = function (producer) {
                     consumer.addItem(command.type, command.model)
                 } else if (command.action == "delete") {
                     consumer.removeItem(consumer.findById(command.id))
+                } else if (command.action == "update") {
+                    consumer.updateItem(consumer.findById(command.id), command.model)
                 } else {
                     console.error("未知command类型", command)
                 }
             })
         })
         return commands
+    }).on("batch",(commands)=>{
+        console.log(`操作更新了${commands.length}条数据，注意及时保存。`)
     })
 
 }

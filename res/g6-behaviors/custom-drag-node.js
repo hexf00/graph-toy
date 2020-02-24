@@ -7,7 +7,7 @@ G6.registerBehavior('custom-drag-node', {
     targetId: null,
 
     updateEdge: true, //更新边
-    enableDelegate: true, //显示框框
+    enableDelegate: true, //显示框框，即延时绘制拖拽结果
     delegateStyle: {
         fill: '#F3F9FF',
         fillOpacity: 0.5,
@@ -129,6 +129,7 @@ G6.registerBehavior('custom-drag-node', {
         graph.setAutoPaint(false);
 
 
+        // 只处理拖拽过程中的绘图
         // 当targets中元素时，则说明拖动的是多个选中的元素
         if (this.targets.length > 0) {
             if (this.enableDelegate) {
@@ -177,12 +178,23 @@ G6.registerBehavior('custom-drag-node', {
         //如果是建立关联，我们是不需要改变位置的
 
         // console.log(this.targetId, this.targets, this.target)
-        //this.targetId 松开鼠标时的节点ID
-        //this.targets 选中节点
-        //this.target 没有选中节点时，松开鼠标时的节点
+        //this.targetId 松开鼠标时的节点ID，在鼠标事件中获取
+        //this.targets 选中节点，即拖拽的拖个节点
+        //this.target 没有选中节点时，松开鼠标时的节点，即拖拽的单个节点，在开始拖拽事件获取
 
         // this.targets 和 this.target是二选一模式
+
+        let dragNodes = []
+        if (this.targets.length > 0) {
+            //多选情况，获取所有已经选中的节点，排除了锁定的节点
+            dragNodes = this.targets
+        } else if (this.target) {
+            //未选中情况，开始拖拽时光标处的节点
+            dragNodes = [this.target]
+        }
+
         if (this.targetId) {
+            //希望建立连线
 
             var findEdge = (model) => {
                 return graph.find('edge', (edge) => {
@@ -235,12 +247,23 @@ G6.registerBehavior('custom-drag-node', {
 
 
         } else {
-
-            if (this.targets.length > 0) {
-                // 获取所有已经选中的节点
-                this.targets.forEach(node => this._update(node, e));
-            } else if (this.target) {
-                this._update(this.target, e);
+            //希望移动
+            if (graph.get('dataLayer')) {
+                if (dragNodes.length) {
+                    let commands = dragNodes.map(node => {
+                        return {
+                            type: "node",
+                            action: "update",
+                            id: node.getModel().id,
+                            model: this.calcPos(node, e)
+                        }
+                    });
+                    graph.get('dataLayer').batch(commands).catch((err) => {
+                        console.error("g6 移动选中节点 时出错")
+                    })
+                }
+            } else {
+                dragNodes.forEach(node => this._update(node, e))
             }
         }
 
@@ -262,11 +285,23 @@ G6.registerBehavior('custom-drag-node', {
         graph.paint();
         graph.setAutoPaint(autoPaint);
     },
+    //计算节点的新位置，仅限非实时拖拽的情况
+    calcPos(item, e) {
+        const origin = this.origin;
+        const model = item.get('model');
+        const x = e.x - origin.x + model.x;
+        const y = e.y - origin.y + model.y;
+        return { x, y }
+    },
+    //force 即 this.enableDelegate的值
     _update(item, e, force) {
+
+
         const origin = this.origin;
         const model = item.get('model');
         const nodeId = item.get('id');
         if (!this.point[nodeId]) {
+            // 需要缓存节点的原始位置，不然节点位置改变后（实时更新的情况），后面无法参与计算
             this.point[nodeId] = {
                 x: model.x,
                 y: model.y
@@ -276,13 +311,15 @@ G6.registerBehavior('custom-drag-node', {
         const x = e.x - origin.x + this.point[nodeId].x;
         const y = e.y - origin.y + this.point[nodeId].y;
 
-        // 拖动单个未选中元素
+        // 拖动单个未选中元素，仅仅在拖拽过程中调用，主要目的是更新框框的位置
         if (force) {
             this._updateDelegate(e, x, y);
             return;
         }
 
         const pos = { x, y };
+
+        //是否更新边
 
         if (this.get('updateEdge')) {
             this.graph.updateItem(item, pos);

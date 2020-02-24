@@ -5,7 +5,9 @@
 //    如G6中会添加一些位置和样式信息，edge.startPoint/endPoint 可以根据关系计算出来，一些样式信息不存储
 //  边的位置信息不存储，这些可以通过计算得出，且计算过程较为复杂
 //  定位：只存储对数据的操作，不涉及具体实例的如何操作改变，以事件的形式通知
-// 需要注意： 数据层不验证数据一致性，如删除node，需要删除所有node关联的edge，需要外部依次传递调用，否则不会删除
+// 需要注意： 数据层不验证数据一致性
+//  如删除node，需要删除所有node关联的edge，需要外部依次传递调用，否则不会删除
+// 如添加连接，不验证联系是否重复
 // 相比原来的直接调用removeItem 这里的确变得繁琐，改变node位置，需要重新计算edge位置也是相同
 
 /**
@@ -45,6 +47,8 @@ DataLayer.prototype.batch = function (commands) {
       actions.push(this.addItem(command))
     } else if (command.action == "delete") {
       actions.push(this.deleteItem(command))
+    } else if (command.action == "update") {
+      actions.push(this.updateItem(command))
     } else {
       console.error("未定义到 batch 操作类型", command.action)
     }
@@ -63,6 +67,22 @@ DataLayer.prototype.addItem = function (command) {
   return new Promise((resolve, reject) => {
     this.data[type + "s"].push(model)
     this.itemMap[model.id] = model
+    resolve(command)
+  })
+}
+
+DataLayer.prototype.updateItem = function (command) {
+  let { type, id, model } = command
+  return new Promise((resolve, reject) => {
+    let item = this.itemMap[id]
+
+    for (const key in command.model) {
+      const val = command.model[key];
+      if (item[key] !== val) {
+        item[key] = val
+      }
+    }
+
     resolve(command)
   })
 }
