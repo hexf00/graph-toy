@@ -26,29 +26,58 @@ G6.registerBehavior('shortcut-keys', {
         if (e.key !== "Tab") {
             if (e.key == "Delete") {
 
+                //构建数据
                 var edges = graph.findAllByState('edge', 'selected');
-                var items = graph.findAllByState('node', 'selected');
+                var nodes = graph.findAllByState('node', 'selected');
 
 
-                if (edges.length == 0 && items.length == 0) {
+                if (edges.length == 0 && nodes.length == 0) {
                     return;
                 }
-                var operaData = {
-                    graph: this.graph.get('container').id,
-                    edges: edges.map(edge => edge.getModel()),
-                    nodes: items.map(item => item.getModel())
-                };
 
+                //构建操作
+                var graphAction = () => {
+                    edges.forEach(edge => graph.removeItem(edge));
+                    nodes.forEach(node => graph.removeItem(node));
+                }
 
+                if (graph.get('dataLayer')) {
+                    let commands = [];
 
+                    var buildDeleteEdgeCommand = edge => commands.push({
+                        type: 'edge',
+                        action: 'delete',
+                        id: edge.getModel().id,
+                        model: edge.getModel(),
+                    })
+                    edges.forEach(buildDeleteEdgeCommand)
 
-                edges.forEach(edge => graph.removeItem(edge));
-                items.forEach(node => graph.removeItem(node));
+                    nodes.forEach(node => {
+                        commands.push({
+                            type: 'node',
+                            action: 'delete',
+                            id: node.getModel().id,
+                            model: node.getModel(),
+                        })
 
+                        //临时实现:节点的关联边需要一并删除，思考是否在数据层中确保数据一致性
+                        node.getEdges().forEach(buildDeleteEdgeCommand)
+
+                    })
+
+                    graph.get('dataLayer').batch(commands)
+                        // .then(graphAction) //对画布的操作在事件广场进行
+                        .catch((err) => {
+                            //终止链
+                            console.error("g6 删除节点 时出错")
+                        })
+                } else {
+                    //没有数据层的情况
+                    graphAction()
+                }
 
                 //多个图目前没有判断焦点，需要认为给图加入一个焦点判断
 
-                scheduler.emit('afterremoveitem', operaData);
 
                 return;
             }
@@ -58,7 +87,7 @@ G6.registerBehavior('shortcut-keys', {
         //判断是否为tab键
 
         //获取选择的节点
-        const nodes = graph.findAllByState('node', 'selected');
+        var nodes = graph.findAllByState('node', 'selected');
 
         if (nodes.length) {
 
@@ -96,11 +125,11 @@ G6.registerBehavior('shortcut-keys', {
                         model: newEdge
                     },
                 ])
-                // .then(graphAction) //对画布的操作在事件广场进行
-                .catch((err) => {
-                    //终止链
-                    console.error("g6 新增节点 时出错")
-                })
+                    // .then(graphAction) //对画布的操作在事件广场进行
+                    .catch((err) => {
+                        //终止链
+                        console.error("g6 新增节点 时出错")
+                    })
             } else {
                 //没有数据层的情况
                 graphAction()

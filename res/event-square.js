@@ -17,6 +17,10 @@ var EventSquare = function (producer) {
             commands.forEach((command) => {
                 if (command.action == "insert") {
                     consumer.addItem(command.type, command.model)
+                } else if (command.action == "delete") {
+                    consumer.removeItem(consumer.findById(command.id))
+                } else {
+                    console.error("未知command类型", command)
                 }
             })
         })
