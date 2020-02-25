@@ -21,10 +21,10 @@
     <script src="res/libs/Scheduler.js"></script>
     <script src="res/import.js"></script>
     <script src="res/data-check.js"></script>
-    <script src="res/data-layer.js"></script>
-    <script src="res/event-square.js"></script>
-    <script src="res/save-manager.js"></script>
 
+    <script src="res/class/Data-Layer.js"></script>
+    <script src="res/class/Event-Square.js"></script>
+    <script src="res/class/Save-Manager.js"></script>
 
     <!-- G6 behavior -->
     <script src="res/g6-behaviors/node-click.js"></script>
@@ -956,7 +956,6 @@
                 showCategoryStatus: false, //label显示分类
                 filterKey: "",
                 saveTime: "", //自动保存时间
-                saveTimeShowText: "无", //保存时间显示
                 graphData: graph.save(),
                 saveManager: saveManager
                 // nodes: graph.save().nodes,
