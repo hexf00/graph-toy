@@ -1,6 +1,6 @@
 // 不适宜添加focus操作，因为中心被遮挡，且会改变已选中的逻辑
 Vue.component('set-category', {
-    template: `<div style="display:inline-block;">
+    template: /*html*/`<div style="display:inline-block;">
         <button @click="showTextEdit">设置分类</button>
         <div v-show="showTextEditStatus" style="
         position: fixed;

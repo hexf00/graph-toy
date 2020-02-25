@@ -1,5 +1,5 @@
 Vue.component('tab', {
-    template: `
+    template: /*html*/`
     <div>
         <ul class="tab-title">
             <li v-for="title in panelTitles" @click="active_c=title" :class="{active:active_c == title}">{{title}}</li>

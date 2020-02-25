@@ -1,5 +1,5 @@
 Vue.component('panel', {
-    template: `
+    template: /*html*/`
     <div v-show="$parent.active_c == title">
         <slot></slot>
     </div>
