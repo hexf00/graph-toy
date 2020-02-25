@@ -1,3 +1,19 @@
+var ControlStatus = false;
+document.onkeydown = function (event) {
+    var e = event || window.event || arguments.callee.caller.arguments[0];
+    if (e && e.key == 'Control') { // 按 Esc 
+        //要做的事情
+        ControlStatus = true;
+    }
+};
+document.onkeyup = function (event) {
+    var e = event || window.event || arguments.callee.caller.arguments[0];
+    if (e && e.key == 'Control') { // 按 Esc 
+        //要做的事情
+        ControlStatus = false;
+    }
+}; 
+
 G6.registerBehavior('node-click', {
     getEvents() {
         return {
