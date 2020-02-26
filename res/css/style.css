@@ -94,21 +94,6 @@ body {
     color: rgb(255, 255, 60);
 }
 
-ul.tab-title {
-    margin: 0;
-    padding: 0;
-}
-
-ul.tab-title li {
-    display: inline-block;
-    cursor: pointer;
-    padding: 5px;
-}
-
-ul.tab-title li.active {
-    font-weight: bold;
-}
-
 span.strong {
     font-weight: bold;
 }
