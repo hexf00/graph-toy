@@ -7,7 +7,7 @@ Vue.component('modal', {
           <a class="close" @click="close">×</a>
         </div>
         <div class="modal-content">
-          <slot></slot>
+          <slot @done="this.$emit('done')" @cancel="this.$emit('cancel')"></slot>
         </div>
       </div>
     </div>
@@ -30,5 +30,5 @@ Vue.component('modal', {
     close() {
       this.show = false
     }
-  },
+  }
 })  

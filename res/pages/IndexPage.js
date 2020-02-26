@@ -15,6 +15,7 @@ let IndexPage = Vue.component('index-page', {
       <li v-for="item in list">
         {{item.name}} 
         <a href="javascript:;" @click="showEdit(item)">编辑名称</a>
+        <a href="javascript:;" @click="remove(item)">删除</a>
 
       </li>
     </ul>
@@ -41,6 +42,9 @@ let IndexPage = Vue.component('index-page', {
     },
     showError(err) {
       alert(err);
+    },
+    remove(item) {
+      graphService.remove(item).then(() => this.refresh()).catch(this.showError)
     },
     showAdd() {
       this.editMode = "add"
