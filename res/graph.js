@@ -18,7 +18,11 @@ try {
 // 使用数据层确保数据的唯一准确性
 var dataLayer = new DataLayer(data);
 var eventSquare = new EventSquare(dataLayer);
-var saveManager = new SaveManager(dataLayer);
+var saveManager = new SaveManager({
+    dataLayer,
+    localStorageKey: "auto-save-data",
+    graphName: "默认图"
+});
 
 // g6操作通知数据层进行数据层数据更新，更新成功后通知g6进行数据更新
 // 考虑到性能，需要将多个操作一起打包

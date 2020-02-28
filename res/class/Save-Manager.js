@@ -9,15 +9,18 @@
 // 用户关注什么我们就告诉用户什么。
 
 //保存管理器
-var SaveManager = function (dataLayer) {
+var SaveManager = function ({ dataLayer, localStorageKey, graphName }) {
     this.dataLayer = dataLayer
+
+    this.localStorageKey = localStorageKey
+    this.graphName = graphName
 
     this.exportStatus = true
     this.changeCount = 0
     this.timer = null //修改后的导出倒计时
     this.autoExportChangeCount = 50 //达到50条记录改变时则自动导出
 
-    this.dataLayer.on("batch", _.throttle(this.saveToLocalStorage, 100, {
+    this.dataLayer.on("batch", _.throttle(() => this.saveToLocalStorage(), 100, {
         leading: false,
         trailing: true //节流结束后执行
     })).on("batch", commands => {
@@ -38,7 +41,7 @@ var SaveManager = function (dataLayer) {
 }
 
 SaveManager.prototype.saveToLocalStorage = function () {
-    localStorage.setItem("auto-save-data", JSON.stringify(this.dataLayer.data))
+    localStorage.setItem(this.localStorageKey, JSON.stringify(this.dataLayer.data))
 }
 
 SaveManager.prototype.download = function (filename, data) {
@@ -55,10 +58,10 @@ SaveManager.prototype.download = function (filename, data) {
 }
 
 SaveManager.prototype.exportData = function () {
-    var filename = "graph-toy.export.json";
-    if (data.nodes.length > 0) {
-        filename = data.nodes[0].label + ".export.json";
-    }
+    var filename = this.graphName + ".export.json";
+    // if (data.nodes.length > 0) {
+    //     filename = data.nodes[0].label + ".export.json";
+    // }
 
     this.download(filename, JSON.stringify(this.dataLayer.data, null, 2))
     console.log("导出记录", filename, new Date());
