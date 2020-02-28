@@ -22,6 +22,7 @@ Vue.component('edit-graph', {
       },
       data: {
         name: this.info && this.info.name,
+        id: this.info && this.info.id
       }
     }
   },

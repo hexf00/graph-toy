@@ -21,11 +21,18 @@ GraphService.prototype.getData = function () {
 }
 GraphService.prototype.checkInput = function (data) {
   // 添加id唯一性判断
-  return new Promise((resolve, reject) => {
+
+  return Promise.resolve(() => {
     if (!data.name || data.name.trim().length === 0) {
-      reject("请输入名称")
+      return Promise.reject("请输入名称")
     } else {
-      resolve(data)
+      return data
+    }
+  }).then(this.getData).then((list) => {
+    if (list.find(item => item.name == data.name && item.id != data.id)) {
+      return Promise.reject("该名称已经被使用，请换一个吧")
+    } else {
+      return data
     }
   })
 }

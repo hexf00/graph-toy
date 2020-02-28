@@ -57,3 +57,8 @@ div.modal > div.modal-title > a.close{
 div.modal > div.modal-content{
     padding: 15px;
 }
+
+div.modal > div.modal-footer{
+    text-align: center;
+    padding: 10px;
+}

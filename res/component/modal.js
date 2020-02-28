@@ -9,10 +9,18 @@ Vue.component('modal', {
         <div class="modal-content">
           <slot @done="this.$emit('done')" @cancel="this.$emit('cancel')"></slot>
         </div>
+        <div v-if="showFooter" class="modal-footer">
+          <button @click="onDone" >确认</button>
+          <button @click="close" >取消</button>
+        </div>
       </div>
     </div>
   `,
   props: {
+    showFooter: {
+      type: Boolean,
+      default: () => true
+    }
   },
   computed: {
   },
@@ -29,6 +37,13 @@ Vue.component('modal', {
     },
     close() {
       this.show = false
+      this.$emit('cancel')
+    },
+    onDone() {
+      this.$emit('done')
+    },
+    onCancel() {
+      this.$emit('cancel')
     }
   }
 })  

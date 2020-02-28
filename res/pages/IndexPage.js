@@ -3,7 +3,14 @@ let IndexPage = Vue.component('index-page', {
     <div v-if="loading">loading</div>
     
     <a href="javascript:;" @click="showAdd">创建</a>
-    <modal ref="modal">
+
+    <modal ref="remove_modal" @done="remove(removeItem)">
+      <div v-if="removeItem">
+        删除后不可恢复，是否要删除 <strong>{{removeItem.name}}</strong>？
+      </div>
+    </modal>
+
+    <modal ref="modal" :show-footer="false">
       <edit-graph :mode="editMode" :info="editItem" @savedone="refresh" @savefail="showError"></edit-graph>
     </modal>
 
@@ -15,7 +22,7 @@ let IndexPage = Vue.component('index-page', {
       <li v-for="item in list">
         {{item.name}} 
         <a href="javascript:;" @click="showEdit(item)">编辑名称</a>
-        <a href="javascript:;" @click="remove(item)">删除</a>
+        <a href="javascript:;" @click="removeConfirm(item)">删除</a>
 
       </li>
     </ul>
@@ -25,6 +32,7 @@ let IndexPage = Vue.component('index-page', {
       loading: true,
       editMode: null,
       editItem: null, //要编辑的item
+      removeItem: null, //要删除的item
       list: []
     }
   },
@@ -43,6 +51,10 @@ let IndexPage = Vue.component('index-page', {
     showError(err) {
       alert(err);
     },
+    removeConfirm(removeItem) {
+      this.removeItem = removeItem
+      this.$refs.remove_modal.open("删除确认")
+    },
     remove(item) {
       graphService.remove(item).then(() => this.refresh()).catch(this.showError)
     },
@@ -58,13 +70,13 @@ let IndexPage = Vue.component('index-page', {
 
       this.$refs.modal.open("编辑图名")
     },
-    onDone(data) {
+    onGetDataDone(data) {
       //重置数据
       this.loading = false
       //设置数据
       this.list = data
     },
-    onFail(err) {
+    onGetDataFail(err) {
       this.loading = false
 
       console.error("出错了")
@@ -73,9 +85,9 @@ let IndexPage = Vue.component('index-page', {
   //第一次进入，无法通过this读取组件实例
   beforeRouteEnter(to, from, next) {
     graphService.getData().then((data) => {
-      next(vm => vm.onDone(data))
+      next(vm => vm.onGetDataDone(data))
     }).catch((err) => {
-      next(vm => vm.onFail(err))
+      next(vm => vm.onGetDataFail(err))
     })
   },
   //重复进入只更新数据
@@ -83,8 +95,8 @@ let IndexPage = Vue.component('index-page', {
     this.loading = true
     this.list = []
     graphService.getData().then((data) => {
-      this.onDone(data)
+      this.onGetDataDone(data)
       next()
-    }).catch(this.onFail)
+    }).catch(this.onGetDataFail)
   },
 })
