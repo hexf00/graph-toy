@@ -6,7 +6,7 @@ GraphService.prototype.getData = function () {
   return new Promise((resolve, reject) => {
 
     try {
-      var rawData = localStorage.getItem("graph-data-set");
+      var rawData = localStorage.getItem("graph-dataset");
       var data = [];
       if (rawData) {
         data = JSON.parse(rawData);
@@ -45,8 +45,8 @@ GraphService.prototype.add = function (data) {
       id: id,
       create_at: new Date()
     })
-    localStorage.setItem("graph-data-set", JSON.stringify(list));
-    localStorage.setItem("graph-data-" + id, JSON.stringify({ nodes: [], edges: [] }));
+    localStorage.setItem("graph-dataset", JSON.stringify(list));
+    localStorage.setItem("graph-dataset-item-" + id, JSON.stringify({ nodes: [], edges: [] }));
 
     return true;
 
@@ -63,7 +63,7 @@ GraphService.prototype.update = function (item, data) {
       }
     })
 
-    localStorage.setItem("graph-data-set", JSON.stringify(list));
+    localStorage.setItem("graph-dataset", JSON.stringify(list));
 
     return true;
   })
@@ -81,8 +81,8 @@ GraphService.prototype.remove = function (data) {
       }
     })
 
-    localStorage.setItem("graph-data-set", JSON.stringify(list.filter(it => it)));
-    localStorage.removeItem("graph-data-" + data.id);
+    localStorage.setItem("graph-dataset", JSON.stringify(list.filter(it => it)));
+    localStorage.removeItem("graph-dataset-item-" + data.id);
 
     return true;
   })
@@ -98,7 +98,7 @@ GraphService.prototype.getByName = function (name) {
     })
 
     if (item) {
-      item.data = JSON.parse(localStorage.getItem("graph-data-" + item.id))
+      item.data = JSON.parse(localStorage.getItem("graph-dataset-item-" + item.id))
 
       return item
     } else {

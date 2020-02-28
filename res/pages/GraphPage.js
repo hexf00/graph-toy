@@ -34,7 +34,7 @@ let GraphPage = Vue.component('graph-page', {
 
       var saveManager = new SaveManager({
         dataLayer,
-        localStorageKey: `graph-data-${data.id}`,
+        localStorageKey: `graph-dataset-item-${data.id}`,
         graphName: data.name
       });
 
