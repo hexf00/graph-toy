@@ -55,6 +55,7 @@ const graph = new G6.Graph({
             'node-click',
             'drag-canvas',
             'zoom-canvas',
+            'item-hover',
             // 边提示框交互工具的配置
             {
                 type: 'edge-tooltip',
@@ -110,30 +111,6 @@ const graph = new G6.Graph({
 eventSquare.addGraph(graph)
 
 
-// 监听鼠标进入节点
-graph.on('node:mouseenter', e => {
-    const nodeItem = e.item;
-    // 设置目标节点的 hover 状态 为 true
-    graph.setItemState(nodeItem, 'hover', true);
-});
-// 监听鼠标离开节点
-graph.on('node:mouseleave', e => {
-    const nodeItem = e.item;
-    // 设置目标节点的 hover 状态 false
-    graph.setItemState(nodeItem, 'hover', false);
-});
-// 监听鼠标进入节点
-graph.on('edge:mouseenter', e => {
-    const nodeItem = e.item;
-    // 设置目标节点的 hover 状态 为 true
-    graph.setItemState(nodeItem, 'hover', true);
-});
-// 监听鼠标离开节点
-graph.on('edge:mouseleave', e => {
-    const nodeItem = e.item;
-    // 设置目标节点的 hover 状态 false
-    graph.setItemState(nodeItem, 'hover', false);
-});
 
 // 监听鼠标点击边
 graph.on('edge:click', e => {

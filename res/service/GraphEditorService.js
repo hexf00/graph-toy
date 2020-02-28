@@ -18,6 +18,7 @@ GraphEditorService.prototype.init = function ({ dom, data, dataLayer }) {
         'node-click',
         'drag-canvas',
         'zoom-canvas',
+        'item-hover',
         // 边提示框交互工具的配置
         {
           type: 'edge-tooltip',
