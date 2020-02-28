@@ -37,62 +37,57 @@ GraphService.prototype.checkInput = function (data) {
   })
 }
 GraphService.prototype.add = function (data) {
-  return new Promise((resolve, reject) => {
-    this.checkInput(data).then(this.getData).then((list) => {
+  return this.checkInput(data).then(this.getData).then((list) => {
 
-      list.unshift({
-        name: data.name,
-        id: uuidv4(),
-        create_at: new Date()
-      })
-      localStorage.setItem("graph-data-set", JSON.stringify(list));
+    let id = uuidv4();
+    list.unshift({
+      name: data.name,
+      id: id,
+      create_at: new Date()
+    })
+    localStorage.setItem("graph-data-set", JSON.stringify(list));
+    localStorage.setItem("graph-data-" + id, JSON.stringify({ nodes: [], edges: [] }));
 
-      resolve();
-
-    }).catch(err => reject(err))
+    return true;
 
   })
 }
 
 GraphService.prototype.update = function (item, data) {
-  return new Promise((resolve, reject) => {
-    this.checkInput(data).then(this.getData).then((list) => {
+  return this.checkInput(data).then(this.getData).then((list) => {
 
-      list.find((it, i) => {
-        if (it.id === item.id) {
-          list[i].name = data.name
-          return true
-        }
-      })
+    list.find((it, i) => {
+      if (it.id === item.id) {
+        list[i].name = data.name
+        return true
+      }
+    })
 
-      localStorage.setItem("graph-data-set", JSON.stringify(list));
+    localStorage.setItem("graph-data-set", JSON.stringify(list));
 
-      resolve();
-
-    }).catch(err => reject(err))
-
+    return true;
   })
+
 }
 
 
 GraphService.prototype.remove = function (data) {
-  return new Promise((resolve, reject) => {
-    this.getData().then((list) => {
+  return this.getData().then((list) => {
 
-      list.find((it, i) => {
-        if (it.id === data.id) {
-          delete list[i]
-          return true
-        }
-      })
+    list.find((it, i) => {
+      if (it.id === data.id) {
+        delete list[i]
+        return true
+      }
+    })
 
-      localStorage.setItem("graph-data-set", JSON.stringify(list.filter(it => it)));
+    localStorage.setItem("graph-data-set", JSON.stringify(list.filter(it => it)));
+    localStorage.removeItem("graph-data-" + data.id);
 
-      resolve();
-
-    }).catch(err => reject(err))
-
+    return true;
   })
+
 }
+
 
 let graphService = new GraphService();
