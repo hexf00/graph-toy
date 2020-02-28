@@ -4,7 +4,7 @@ body {
     padding: 0;
 }
 
-#mountNode {
+.graph{
     width: 100%;
     height: 100%;
 }
