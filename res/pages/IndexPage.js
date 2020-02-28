@@ -21,6 +21,7 @@ let IndexPage = Vue.component('index-page', {
     <ul v-else>
       <li v-for="item in list">
         {{item.name}} 
+        <router-link :to="'/graph/'+item.name">编辑数据</router-link>
         <a href="javascript:;" @click="showEdit(item)">编辑名称</a>
         <a href="javascript:;" @click="removeConfirm(item)">删除</a>
 

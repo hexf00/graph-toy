@@ -89,5 +89,22 @@ GraphService.prototype.remove = function (data) {
 
 }
 
+GraphService.prototype.getByName = function (name) {
+  return this.getData().then((list) => {
+    let item = list.find((it, i) => {
+      if (it.name === name) {
+        return true
+      }
+    })
+
+    if (item) {
+      item.data = JSON.parse(localStorage.getItem("graph-data-" + item.id))
+
+      return item
+    } else {
+      return Promise.reject("要找的图表不存在，可能已经被删除.")
+    }
+  })
+}
 
 let graphService = new GraphService();
