@@ -104,6 +104,7 @@ const graph = new G6.Graph({
         }
     },
     dataLayer: dataLayer, //绑定数据层实例
+    eventSquare, //绑定事件广场
     animate: true            // Boolean，可选，切换布局时是否使用动画过度
 });
 

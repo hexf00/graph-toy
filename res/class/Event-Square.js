@@ -10,10 +10,13 @@ var EventSquare = function (producer) {
     this.producer = producer
 
     //数据消费者
-    this.consumers = []
+    this.consumers = {
+        g6: [],
+        vue: [],
+    }
 
     this.producer.on("batch", (commands) => {
-        this.consumers.forEach((consumer) => {
+        this.consumers.g6.forEach((consumer) => {
             var graph = consumer;
 
             const autoPaint = graph.get('autoPaint');
@@ -39,17 +42,35 @@ var EventSquare = function (producer) {
         console.log(`操作更新了${commands.length}条数据，注意及时保存。`)
     })
 
+    this.scheduler = new Scheduler()
+
+    this.scheduler.on("focusItem", (data) => {
+        this.consumers.vue.forEach((consumer) => {
+            var vm = consumer;
+            console.log(vm);
+            vm.focusItem(data);
+        })
+    })
+
+    //在外部监听，使用场景：1. g6通知vue实例激活指定节点的编辑面板
+    this.on = this.scheduler.on.bind(this.scheduler)
+    this.emit = this.scheduler.emit.bind(this.scheduler)
 }
 
-// 注册G6实例，未来可以有别的实例
+// 注册G6实例
 EventSquare.prototype.addGraph = function (graph) {
-    this.consumers.push(graph)
+    this.consumers.g6.push(graph)
 }
 
-// 注销G6实例，未来可以有别的实例
+// 注销G6实例
 EventSquare.prototype.removeGraph = function (graph) {
-    var graphIndex = this.consumers.indexOf(graph)
+    var graphIndex = this.consumers.g6.indexOf(graph)
     if (graphIndex !== -1) {
-        this.consumers.splice(graphIndex, 1)
+        this.consumers.g6.splice(graphIndex, 1)
     }
+}
+
+// 注册Vue实例
+EventSquare.prototype.addVue = function (vm) {
+    this.consumers.vue.push(vm)
 }

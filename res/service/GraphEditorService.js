@@ -2,7 +2,7 @@ function GraphEditorService() {
 
 }
 
-GraphEditorService.prototype.init = function ({ dom, data, dataLayer }) {
+GraphEditorService.prototype.init = function ({ dom, data, dataLayer, eventSquare }) {
   const graph = new G6.Graph({
     container: dom,  // String | HTMLElement，必须，容器 id 或容器本身
     width: Math.floor(dom.clientWidth),              // Number，必须，图的宽度
@@ -65,7 +65,8 @@ GraphEditorService.prototype.init = function ({ dom, data, dataLayer }) {
         stroke: '#f00'
       }
     },
-    dataLayer: dataLayer, //绑定数据层实例
+    dataLayer, //绑定数据层实例
+    eventSquare,//绑定事件广场实例
     animate: true            // Boolean，可选，切换布局时是否使用动画过度
   });
 

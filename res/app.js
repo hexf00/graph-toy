@@ -362,6 +362,10 @@ var app = new Vue({
 
             graph.changeData(data)
         },
+        focusItem: function (data) {
+            app.currentType = data.type;
+            app.currentItem = data.data;
+        },
         focus: function (target) {
             console.log(target, this);
 
@@ -435,6 +439,7 @@ var app = new Vue({
         this.renderTypeStyle();//渲染Type颜色
         this.renderVisible();
         this.renderReader();
+        eventSquare.addVue(this)
     },
     data: {
         contentHtml: '',

@@ -41,9 +41,10 @@ G6.registerBehavior('item-click', {
 
         graph.setItemState(item, 'selected', !item.hasState('selected'));
 
-        // VUE面板用
-        app.currentType = "Node";
-        app.currentItem = item.getModel();
+
+        if (graph.get('eventSquare')) {
+            graph.get('eventSquare').emit("focusItem", { type: "Node", data: e.item.getModel() })
+        }
     },
 
     // 监听鼠标点击边
@@ -59,8 +60,8 @@ G6.registerBehavior('item-click', {
         // 设置目标边的 click 状态 为 true
         graph.setItemState(edgeItem, 'selected', true);
 
-
-        app.currentType = "Edge";
-        app.currentItem = edgeItem.getModel();
+        if (graph.get('eventSquare')) {
+            graph.get('eventSquare').emit("focusItem", { type: "Edge", data: e.item.getModel() })
+        }
     }
 });

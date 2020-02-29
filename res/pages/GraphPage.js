@@ -30,6 +30,9 @@ let GraphPage = Vue.component('graph-page', {
     }
   },
   methods: {
+    focusItem(data) {
+      console.log(data);
+    },
     onGetDataDone(data) {
       //重置数据
       this.loading = false
@@ -39,14 +42,16 @@ let GraphPage = Vue.component('graph-page', {
       this.dataLayer = new DataLayer(data.data);
       var dataLayer = this.dataLayer;
 
+      var eventSquare = new EventSquare(dataLayer);
       var graph = graphEditorService.init({
         dom: this.$refs.graph,
         data: data.data,
-        dataLayer
+        dataLayer,
+        eventSquare
       })
 
-      var eventSquare = new EventSquare(dataLayer);
       eventSquare.addGraph(graph);
+      eventSquare.addVue(this);
 
       this.saveManager = new SaveManager({
         dataLayer,
