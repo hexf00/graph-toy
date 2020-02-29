@@ -11,6 +11,13 @@ let GraphPage = Vue.component('graph-page', {
             <node-list :data="dataLayer.data.nodes"></node-list>
           </panel>
         </tab>
+
+        <tab active="属性" class="tab attr-bar">
+          <panel title="属性" class="search-bar">
+            <item-form v-if="editItem" :type="editType" :item="editItem"></item-form>
+            <div v-else>未选择节点或属性</div>
+          </panel>
+        </tab>
       </div>
 
       <div style="position:absolute;width:100%;height:100%;overflow-y: hidden;">      
@@ -21,6 +28,8 @@ let GraphPage = Vue.component('graph-page', {
   data() {
     return {
       loading: true,
+      editType: "",//Node or Edge
+      editItem: null,
       dataLayer: {
         data: []
       },
@@ -31,7 +40,8 @@ let GraphPage = Vue.component('graph-page', {
   },
   methods: {
     focusItem(data) {
-      console.log(data);
+      this.editType = data.type
+      this.editItem = data.data
     },
     onGetDataDone(data) {
       //重置数据
