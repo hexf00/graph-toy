@@ -4,6 +4,7 @@ let GraphPage = Vue.component('graph-page', {
         <div ref="graph" class="graph"></div>
       </div>
       <div style="position:absolute">
+        <router-link to="/">主页</router-link>
         <button onclick="saveManager.exportData()">导出</button>
         <span>未导出改动:{{saveManager.changeCount}}</span>
       </div>

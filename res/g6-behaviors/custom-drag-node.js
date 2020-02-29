@@ -259,8 +259,12 @@ G6.registerBehavior('custom-drag-node', {
     calcPos(item, e) {
         const origin = this.origin;
         const model = item.get('model');
-        const x = e.x - origin.x + model.x;
-        const y = e.y - origin.y + model.y;
+        let x = e.x - origin.x + model.x;
+        let y = e.y - origin.y + model.y;
+
+        x = parseFloat(parseFloat(x).toFixed(2))
+        y = parseFloat(parseFloat(y).toFixed(2))
+
         return { x, y }
     },
     //force 即 this.enableDelegate的值
@@ -278,8 +282,11 @@ G6.registerBehavior('custom-drag-node', {
             };
         }
 
-        const x = e.x - origin.x + this.point[nodeId].x;
-        const y = e.y - origin.y + this.point[nodeId].y;
+        let x = e.x - origin.x + this.point[nodeId].x;
+        let y = e.y - origin.y + this.point[nodeId].y;
+
+        x = parseFloat(parseFloat(x).toFixed(2))
+        y = parseFloat(parseFloat(y).toFixed(2))
 
         // 拖动单个未选中元素，仅仅在拖拽过程中调用，主要目的是更新框框的位置
         if (force) {
