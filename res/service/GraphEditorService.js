@@ -14,7 +14,7 @@ GraphEditorService.prototype.init = function ({ dom, data, dataLayer }) {
         'shortcut-keys',
         'brush-select',
         'custom-drag-node',
-        'node-click',
+        'item-click',
         'drag-canvas',
         'zoom-canvas',
         'item-hover',

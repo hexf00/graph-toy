@@ -52,7 +52,7 @@ const graph = new G6.Graph({
             'shortcut-keys',
             'brush-select',
             'custom-drag-node',
-            'node-click',
+            'item-click',
             'drag-canvas',
             'zoom-canvas',
             'item-hover',
@@ -109,24 +109,6 @@ const graph = new G6.Graph({
 
 //注册数据消费者实例到事件广场
 eventSquare.addGraph(graph)
-
-
-
-// 监听鼠标点击边
-graph.on('edge:click', e => {
-    // 先将所有当前有 click 状态的边的 click 状态置为 false
-    const clickEdges = graph.findAllByState('edge', 'selected');
-    clickEdges.forEach(ce => {
-        graph.setItemState(ce, 'selected', false);
-    });
-    const edgeItem = e.item;
-    // 设置目标边的 click 状态 为 true
-    graph.setItemState(edgeItem, 'selected', true);
-
-
-    app.currentType = "Edge";
-    app.currentItem = edgeItem.getModel();
-});
 
 //参考antv-2018.alipay.com/zh-cn/g6/3.x/demo/tool/context-menu.html
 graph.on('node:contextmenu', function (evt) {
