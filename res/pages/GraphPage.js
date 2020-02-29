@@ -1,34 +1,43 @@
 let GraphPage = Vue.component('graph-page', {
   template: /*html*/`<div>
-      <div style="position:absolute;width:100%;height:100%;overflow-y: hidden;">      
-        <div ref="graph" class="graph"></div>
-      </div>
-      <div style="position:absolute">
+
+      <div style="position:fixed;z-index:999999">
         <router-link to="/">主页</router-link>
         <button onclick="saveManager.exportData()">导出</button>
         <span>未导出改动:{{saveManager.changeCount}}</span>
+
+        <tab active="节点" class="tab left-bar">
+          <panel title="节点" class="search-bar">
+            <node-list :data="dataLayer.data.nodes"></node-list>
+          </panel>
+        </tab>
       </div>
+
+      <div style="position:absolute;width:100%;height:100%;overflow-y: hidden;">      
+        <div ref="graph" class="graph"></div>
+      </div>
+    
     </div>`,
   data() {
     return {
       loading: true,
+      dataLayer: {
+        data: []
+      },
       saveManager: {
-        changeCount:0,
+        changeCount: 0,
       },
     }
   },
   methods: {
-
-    getData() {
-
-    },
     onGetDataDone(data) {
       //重置数据
       this.loading = false
 
       //设置数据
 
-      var dataLayer = new DataLayer(data.data);
+      this.dataLayer = new DataLayer(data.data);
+      var dataLayer = this.dataLayer;
 
       var graph = graphEditorService.init({
         dom: this.$refs.graph,
@@ -74,12 +83,12 @@ let GraphPage = Vue.component('graph-page', {
     }).catch(this.onGetDataFail)
   },
   // 路由离开时间, 作销毁操作
-  beforeRouteLeave(to, from, next){
-    if( this.saveManager.changeCount > 0){
+  beforeRouteLeave(to, from, next) {
+    if (this.saveManager.changeCount > 0) {
       console.log("存在没有保存的数据,应该提示用户导出保存");
       this.saveManager.destroy();
       next();
-    }else{
+    } else {
       next();
     }
   }

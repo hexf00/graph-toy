@@ -3,7 +3,6 @@ function GraphEditorService() {
 }
 
 GraphEditorService.prototype.init = function ({ dom, data, dataLayer }) {
-  console.log(dom)
   const graph = new G6.Graph({
     container: dom,  // String | HTMLElement，必须，容器 id 或容器本身
     width: Math.floor(dom.clientWidth),              // Number，必须，图的宽度
