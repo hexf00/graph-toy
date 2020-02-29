@@ -74,3 +74,11 @@ SaveManager.prototype.exportData = function () {
         this.timer = null
     }
 }
+
+SaveManager.prototype.destroy = function () {
+    //销毁定时器
+    if (this.timer) {
+        clearTimeout(this.timer)
+        this.timer = null
+    }
+}

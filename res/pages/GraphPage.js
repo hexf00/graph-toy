@@ -1,13 +1,19 @@
 let GraphPage = Vue.component('graph-page', {
   template: /*html*/`<div>
-      <div style="position:absolute;width:100%;height:100%;overflow-y: hidden;">
+      <div style="position:absolute;width:100%;height:100%;overflow-y: hidden;">      
         <div ref="graph" class="graph"></div>
       </div>
-      
+      <div style="position:absolute">
+        <button onclick="saveManager.exportData()">导出</button>
+        <span>未导出改动:{{saveManager.changeCount}}</span>
+      </div>
     </div>`,
   data() {
     return {
       loading: true,
+      saveManager: {
+        changeCount:0,
+      },
     }
   },
   methods: {
@@ -32,7 +38,7 @@ let GraphPage = Vue.component('graph-page', {
       var eventSquare = new EventSquare(dataLayer);
       eventSquare.addGraph(graph);
 
-      var saveManager = new SaveManager({
+      this.saveManager = new SaveManager({
         dataLayer,
         localStorageKey: `graph-dataset-item-${data.id}`,
         graphName: data.name
@@ -66,4 +72,14 @@ let GraphPage = Vue.component('graph-page', {
       next()
     }).catch(this.onGetDataFail)
   },
+  // 路由离开时间, 作销毁操作
+  beforeRouteLeave(to, from, next){
+    if( this.saveManager.changeCount > 0){
+      console.log("存在没有保存的数据,应该提示用户导出保存");
+      this.saveManager.destroy();
+      next();
+    }else{
+      next();
+    }
+  }
 })
