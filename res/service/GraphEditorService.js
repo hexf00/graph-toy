@@ -1,8 +1,12 @@
-function GraphEditorService() {
-
+function GraphEditorService(dataLayer) {
+  this.dataLayer = dataLayer
 }
 
-GraphEditorService.prototype.init = function ({ dom, data, dataLayer, eventSquare }) {
+GraphEditorService.prototype.updateItem = function (command) {
+  return this.dataLayer.batch([command])
+}
+
+GraphEditorService.prototype.init = function ({ dom, data, eventSquare }) {
   const graph = new G6.Graph({
     container: dom,  // String | HTMLElement，必须，容器 id 或容器本身
     width: Math.floor(dom.clientWidth),              // Number，必须，图的宽度
@@ -65,7 +69,7 @@ GraphEditorService.prototype.init = function ({ dom, data, dataLayer, eventSquar
         stroke: '#f00'
       }
     },
-    dataLayer, //绑定数据层实例
+    dataLayer: this.dataLayer, //绑定数据层实例
     eventSquare,//绑定事件广场实例
     animate: true            // Boolean，可选，切换布局时是否使用动画过度
   });
@@ -84,5 +88,3 @@ GraphEditorService.prototype.init = function ({ dom, data, dataLayer, eventSquar
   graph.render();
   return graph;
 }
-
-let graphEditorService = new GraphEditorService();

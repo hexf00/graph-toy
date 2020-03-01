@@ -107,4 +107,5 @@ GraphService.prototype.getByName = function (name) {
   })
 }
 
+//全局唯一
 let graphService = new GraphService();

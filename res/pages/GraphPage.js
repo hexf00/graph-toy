@@ -8,13 +8,16 @@ let GraphPage = Vue.component('graph-page', {
 
         <tab active="节点" class="tab left-bar">
           <panel title="节点" class="search-bar">
-            <node-list :data="dataLayer.data.nodes"></node-list>
+            <node-list :data="dataLayer.data.nodes" @focusNode="focusNode"></node-list>
           </panel>
         </tab>
 
         <tab active="属性" class="tab attr-bar">
           <panel title="属性" class="search-bar">
-            <item-form v-if="editItem" :type="editType" :item="editItem"></item-form>
+            <div v-if="editItem">
+              <node-form v-if="editType == 'Node'" :item="editItem" @updateItem="updateItem"></node-form>
+              <edge-form v-if="editType == 'Edge'" :item="editItem" @updateItem="updateItem"></edge-form>
+            </div>
             <div v-else>未选择节点或属性</div>
           </panel>
         </tab>
@@ -33,15 +36,36 @@ let GraphPage = Vue.component('graph-page', {
       dataLayer: {
         data: []
       },
+      graphEditorService: null,
       saveManager: {
         changeCount: 0,
       },
     }
   },
   methods: {
+    //node-list触发的方法
+    focusNode() {
+      console.log(arguments)
+    },
+    //G6触发的方法,激活Vue
     focusItem(data) {
       this.editType = data.type
-      this.editItem = data.data
+
+      if (data.type == "Node") {
+        this.editItem = this.dataLayer.itemMap[data.data.id]
+      } else {
+        this.editItem = Object.assign({}, this.dataLayer.itemMap[data.data.id])
+        this.editItem.soureItem = this.dataLayer.itemMap[this.editItem.source]
+        this.editItem.targetItem = this.dataLayer.itemMap[this.editItem.target]
+      }
+
+    },
+    updateItem(command) {
+      this.graphEditorService.updateItem(command).then(() => {
+        console.error("更新数据成功")
+      }).catch((err) => {
+        console.error("更新数据时出错")
+      })
     },
     onGetDataDone(data) {
       //重置数据
@@ -53,10 +77,11 @@ let GraphPage = Vue.component('graph-page', {
       var dataLayer = this.dataLayer;
 
       var eventSquare = new EventSquare(dataLayer);
-      var graph = graphEditorService.init({
+
+      this.graphEditorService = new GraphEditorService(dataLayer);
+      var graph = this.graphEditorService.init({
         dom: this.$refs.graph,
         data: data.data,
-        dataLayer,
         eventSquare
       })
 
