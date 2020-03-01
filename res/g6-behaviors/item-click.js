@@ -43,7 +43,7 @@ G6.registerBehavior('item-click', {
 
 
         if (graph.get('eventSquare')) {
-            graph.get('eventSquare').emit("focusItem", { type: "node", model: e.item.getModel() })
+            graph.get('eventSquare').emit("g6FocusItem", { type: "node", model: e.item.getModel() })
         }
     },
 
@@ -61,7 +61,7 @@ G6.registerBehavior('item-click', {
         graph.setItemState(edgeItem, 'selected', true);
 
         if (graph.get('eventSquare')) {
-            graph.get('eventSquare').emit("focusItem", { type: "edge", model: e.item.getModel() })
+            graph.get('eventSquare').emit("g6FocusItem", { type: "edge", model: e.item.getModel() })
         }
     }
 });

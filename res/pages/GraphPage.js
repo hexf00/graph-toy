@@ -46,6 +46,7 @@ let GraphPage = Vue.component('graph-page', {
     //node-list触发的方法
     focusNode(id) {
       this.focusItem("node", id)
+      this.eventSquare.emit("vueFocusNode", id)
     },
     //G6触发的方法,激活Vue属性面板
     focusItem(type, id) {
@@ -74,22 +75,22 @@ let GraphPage = Vue.component('graph-page', {
       //设置数据
 
       this.dataLayer = new DataLayer(data.data);
-      var dataLayer = this.dataLayer;
 
-      var eventSquare = new EventSquare(dataLayer);
+
+      this.eventSquare = new EventSquare(dataLayer);
 
       this.graphEditorService = new GraphEditorService(dataLayer);
       var graph = this.graphEditorService.init({
         dom: this.$refs.graph,
         data: data.data,
-        eventSquare
+        eventSquare: this.eventSquare,
       })
 
-      eventSquare.addGraph(graph);
-      eventSquare.addVue(this);
+      this.eventSquare.addGraph(graph);
+      this.eventSquare.addVue(this);
 
       this.saveManager = new SaveManager({
-        dataLayer,
+        dataLayer: this.dataLayer,
         localStorageKey: `graph-dataset-item-${data.id}`,
         graphName: data.name
       });
