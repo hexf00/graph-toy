@@ -77,9 +77,9 @@ let GraphPage = Vue.component('graph-page', {
       this.dataLayer = new DataLayer(data.data);
 
 
-      this.eventSquare = new EventSquare(dataLayer);
+      this.eventSquare = new EventSquare(this.dataLayer);
 
-      this.graphEditorService = new GraphEditorService(dataLayer);
+      this.graphEditorService = new GraphEditorService(this.dataLayer);
       var graph = this.graphEditorService.init({
         dom: this.$refs.graph,
         data: data.data,
@@ -128,6 +128,8 @@ let GraphPage = Vue.component('graph-page', {
     if (this.saveManager.changeCount > 0) {
       console.log("存在没有保存的数据,应该提示用户导出保存");
       this.saveManager.destroy();
+      this.eventSquare.destroy();
+      this.dataLayer.destroy();
       next();
     } else {
       next();

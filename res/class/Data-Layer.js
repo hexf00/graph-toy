@@ -111,3 +111,10 @@ DataLayer.prototype.deleteItem = function (command) {
     resolve(command)
   })
 }
+
+// 销毁
+DataLayer.prototype.destroy = function (vm) {
+  this.scheduler.destroy()
+  this.data = { nodes: [], edges: [] }
+  this.itemMap = {}
+}

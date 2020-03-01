@@ -45,3 +45,7 @@ Scheduler.prototype.emit = function () {
     }
 }
 
+Scheduler.prototype.destroy = function () {
+    this.funcs = {}
+}
+

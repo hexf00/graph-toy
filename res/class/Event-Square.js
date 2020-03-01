@@ -126,3 +126,8 @@ EventSquare.prototype.removeGraph = function (graph) {
 EventSquare.prototype.addVue = function (vm) {
   this.consumers.vue.push(vm)
 }
+
+// 销毁
+EventSquare.prototype.destroy = function (vm) {
+  this.scheduler.destroy()
+}
