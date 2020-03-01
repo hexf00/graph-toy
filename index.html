@@ -14,13 +14,17 @@
     <script src="https://cdn.staticfile.org/moment.js/2.24.0/moment.js"></script>
     <script src="https://cdn.staticfile.org/moment.js/2.24.0/locale/zh-cn.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uuid@7.0.0-beta.0/dist/umd/uuidv4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 
     <!-- func -->
     <script src="res/mark.js"></script>
-    <script src="res/libs/Scheduler.js"></script>
     <script src="res/import.js"></script>
     <script src="res/data-check.js"></script>
+
+    <script src="res/libs/Scheduler.js"></script>
+    <script src="res/libs/notify.js"></script>
 
     <!-- 大杂烩函数，待归类 -->
     <script src="res/funcs.js"></script>
@@ -63,7 +67,7 @@
 
 <body>
     <div id="app">
-        <div style="position: fixed;z-index: 999999999;background-color: #fff;left: 0;right: 0;top:0;bottom: 0;">
+        <div style="position: fixed;z-index: 999999;background-color: #fff;left: 0;right: 0;top:0;bottom: 0;">
             <router-view></router-view>
         </div>
 

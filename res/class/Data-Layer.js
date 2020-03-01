@@ -24,7 +24,7 @@ var DataLayer = function (data) {
       this.itemMap[model.id] = model
     } else {
       //id重复
-      console.error("id重复", model);
+      console.error("存在id重复,请检查数据:", model);
     }
   }
   this.data.nodes.forEach(mapItemInit)

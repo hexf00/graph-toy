@@ -62,9 +62,9 @@ let GraphPage = Vue.component('graph-page', {
     },
     updateItem(command) {
       this.graphEditorService.updateItem(command).then(() => {
-        console.error("更新数据成功")
+        notify.success("数据更新成功")
       }).catch((err) => {
-        console.error("更新数据时出错")
+        notify.error("更新数据时出错")
       })
     },
     onGetDataDone(data) {

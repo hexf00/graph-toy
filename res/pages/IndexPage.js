@@ -11,7 +11,7 @@ let IndexPage = Vue.component('index-page', {
     </modal>
 
     <modal ref="modal" :show-footer="false">
-      <edit-graph :mode="editMode" :info="editItem" @savedone="refresh" @savefail="showError"></edit-graph>
+      <edit-graph :mode="editMode" :info="editItem" @savedone="savedone" @savefail="showError"></edit-graph>
     </modal>
 
     <div v-if="list.length == 0">
@@ -49,15 +49,22 @@ let IndexPage = Vue.component('index-page', {
       })
       // this.$router.go(0)
     },
+    savedone() {
+      this.refresh()
+      notify.success(this.editMode == "add" ? "创建成功" : "命名成功")
+    },
     showError(err) {
-      alert(err);
+      notify.error(err)
     },
     removeConfirm(removeItem) {
       this.removeItem = removeItem
       this.$refs.remove_modal.open("删除确认")
     },
     remove(item) {
-      graphService.remove(item).then(() => this.refresh()).catch(this.showError)
+      graphService.remove(item).then(() => {
+        this.refresh()
+        notify.success("删除成功")
+      }).catch(this.showError)
     },
     showAdd() {
       this.editMode = "add"
@@ -79,8 +86,7 @@ let IndexPage = Vue.component('index-page', {
     },
     onGetDataFail(err) {
       this.loading = false
-
-      console.error("出错了")
+      notify.success(err)
     },
   },
   //第一次进入，无法通过this读取组件实例
