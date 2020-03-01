@@ -15,8 +15,8 @@ let GraphPage = Vue.component('graph-page', {
         <tab active="属性" class="tab attr-bar">
           <panel title="属性" class="search-bar">
             <div v-if="editItem">
-              <node-form v-if="editType == 'Node'" :item="editItem" @updateItem="updateItem"></node-form>
-              <edge-form v-if="editType == 'Edge'" :item="editItem" @updateItem="updateItem"></edge-form>
+              <node-form v-if="editType == 'node'" :item="editItem" @updateItem="updateItem"></node-form>
+              <edge-form v-if="editType == 'edge'" :item="editItem" @updateItem="updateItem"></edge-form>
             </div>
             <div v-else>未选择节点或属性</div>
           </panel>
@@ -31,7 +31,7 @@ let GraphPage = Vue.component('graph-page', {
   data() {
     return {
       loading: true,
-      editType: "",//Node or Edge
+      editType: "",//node or edge
       editItem: null,
       dataLayer: {
         data: []
@@ -44,17 +44,17 @@ let GraphPage = Vue.component('graph-page', {
   },
   methods: {
     //node-list触发的方法
-    focusNode() {
-      console.log(arguments)
+    focusNode(id) {
+      this.focusItem("node", id)
     },
-    //G6触发的方法,激活Vue
-    focusItem(data) {
-      this.editType = data.type
+    //G6触发的方法,激活Vue属性面板
+    focusItem(type, id) {
+      this.editType = type
 
-      if (data.type == "Node") {
-        this.editItem = this.dataLayer.itemMap[data.data.id]
+      if (type == "node") {
+        this.editItem = this.dataLayer.itemMap[id]
       } else {
-        this.editItem = Object.assign({}, this.dataLayer.itemMap[data.data.id])
+        this.editItem = Object.assign({}, this.dataLayer.itemMap[id])
         this.editItem.soureItem = this.dataLayer.itemMap[this.editItem.source]
         this.editItem.targetItem = this.dataLayer.itemMap[this.editItem.target]
       }

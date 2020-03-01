@@ -38,6 +38,8 @@ let itemForm = {
           id: this.item.id,
           model: updateModel,
         })
+      }else{
+        notify.info("没有修改")
       }
     }
   }

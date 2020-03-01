@@ -44,10 +44,10 @@ var EventSquare = function (producer) {
 
     this.scheduler = new Scheduler()
 
-    this.scheduler.on("focusItem", (data) => {
+    this.scheduler.on("focusItem", ({ type, model }) => {
         this.consumers.vue.forEach((consumer) => {
             var vm = consumer;
-            vm.focusItem(data);
+            vm.focusItem(type, model.id);
         })
     })
 

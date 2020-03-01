@@ -62,3 +62,10 @@ div.modal > div.modal-footer{
     text-align: center;
     padding: 10px;
 }
+
+div.node-list li{
+    cursor: pointer;
+}
+div.node-list li:hover{
+    opacity:0.6;
+}

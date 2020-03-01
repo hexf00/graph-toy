@@ -363,8 +363,8 @@ var app = new Vue({
             graph.changeData(data)
         },
         focusItem: function (data) {
-            app.currentType = data.type;
-            app.currentItem = data.data;
+            app.currentType = data.type == "node" ? "Node" : "Edge";
+            app.currentItem = data.model;
         },
         focus: function (target) {
             console.log(target, this);

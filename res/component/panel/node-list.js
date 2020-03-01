@@ -1,8 +1,7 @@
 Vue.component('node-list', {
-  template: /*html*/`<div>
+  template: /*html*/`<div class="node-list">
     <ul>
-      <li v-for="node in data" :title="node.label" :data-id="node.id"
-          @click="focus">
+      <li v-for="node in data" :title="node.label" :data-id="node.id" @click="focus">
           {{node.label}}
       </li>
     </ul>
