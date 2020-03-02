@@ -1,6 +1,7 @@
 let itemForm = {
   props: {
     item: Object,
+    type: String,
   },
   watch: {
     item() {
@@ -33,12 +34,12 @@ let itemForm = {
 
       if (changeCount > 0) {
         this.$emit("updateItem", {
-          type: "edge",
+          type: this.type,
           action: "update",
           id: this.item.id,
           model: updateModel,
         })
-      }else{
+      } else {
         notify.info("没有修改")
       }
     }
