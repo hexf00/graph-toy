@@ -26,7 +26,8 @@ let itemForm = {
       var updateModel = {}
       var changeCount = 0
       for (const key in this.data) {
-        if (this.data[key] !== this.item[key]) {
+        // 排除拖拽改变了节点的位置
+        if (key != 'x' && key != 'y' && this.data[key] !== this.item[key]) {
           updateModel[key] = this.data[key]
           changeCount++
         }
