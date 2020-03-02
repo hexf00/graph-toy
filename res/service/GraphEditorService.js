@@ -8,16 +8,31 @@ GraphEditorService.prototype.updateItem = function (command) {
 }
 
 GraphEditorService.prototype.buildNodeStyle = function (node) {
-  var labelFill = {
-    word: '#fdf72f',//黄色
-    entity: '#9ba0ff',//蓝色
-    class: '#ce621d',//橙色
+  var styleDict = {
+    word: {
+      fill: '#fdf72f',//黄色
+      stroke: '#ddd',
+    },
+    entity: {
+      fill: '#91d5ff',//蓝色,g6默认色
+      stroke: '#ddd',
+    },
+    class: {
+      fill: '#e473db', //紫色
+      stroke: '#ddd',
+    },
+    default: {
+      fill: "#ddd", //灰色
+      stroke: '#ddd'
+    }
   }
 
   var style = {};
 
-  if (node.type) {
-    style.fill = labelFill[node.type]
+  if (node._type) {
+    Object.assign(style, styleDict[node._type])
+  } else {
+    Object.assign(style, styleDict.default)
   }
 
   return style
@@ -56,8 +71,7 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       ]
     },
     defaultEdge: {
-      //3.2 无效
-      type: 'quadratic', // 指定边的形状为二阶贝塞尔曲线
+      type: 'quadratic', // 指定边的形状为二阶贝塞尔曲线 3.2无效
       style: {
         endArrow: true,
         lineWidth: 2
@@ -68,7 +82,7 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
         // hover 状态为 true 时的样式
         stroke: '#ff5959',
         shadowColor: '#aaa',
-        shadowBlur:30,
+        shadowBlur: 30,
       },
     },
     // layout: {
@@ -89,7 +103,7 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       selected: {
         stroke: '#ff5959',
         shadowColor: '#aaa',
-        shadowBlur:30,
+        shadowBlur: 30,
       }
     },
     dataLayer: this.dataLayer, //绑定数据层实例

@@ -4,7 +4,7 @@ Vue.component('node-form', {
     <p>label：<input type="text" v-model="data.label" name="label"></p>
     <p>分类：<input type="text" v-model="data.category" name="category"></p>
     <p>类型：
-      <select v-model="data.type">
+      <select v-model="data._type">
           <option value="">无</option>
           <option value="word">词语</option>
           <option value="entity">实体</option>
