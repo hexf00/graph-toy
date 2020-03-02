@@ -78,6 +78,10 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       }
     },
     nodeStateStyles: {
+      hover: {
+        stroke: '#ff5959',
+        lineWidth: 1, //default样式
+      },
       selected: {
         // hover 状态为 true 时的样式
         stroke: '#ff5959',
