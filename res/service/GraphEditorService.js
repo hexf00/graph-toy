@@ -66,7 +66,9 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
     nodeStateStyles: {
       selected: {
         // hover 状态为 true 时的样式
-        fill: '#d3adf7',
+        stroke: '#ff5959',
+        shadowColor: '#aaa',
+        shadowBlur:30,
       },
     },
     // layout: {
@@ -81,11 +83,13 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
     // 边在各状态下的样式
     edgeStateStyles: {
       hover: {
-        stroke: '#f00'
+        stroke: '#ff5959'
       },
       // click 状态为 true 时的样式
       selected: {
-        stroke: '#f00'
+        stroke: '#ff5959',
+        shadowColor: '#aaa',
+        shadowBlur:30,
       }
     },
     dataLayer: this.dataLayer, //绑定数据层实例
