@@ -6,6 +6,9 @@
 
 var EventSquare = function (producer) {
 
+  //services
+  this.services = {}
+
   //数据生产者
   this.producer = producer
 
@@ -24,11 +27,23 @@ var EventSquare = function (producer) {
 
       commands.forEach((command) => {
         if (command.action == "insert") {
-          graph.addItem(command.type, Object.assign({}, command.model))
+          let model = Object.assign({}, command.model)
+          if (command.type == "node") {
+            model.style = this.services.graphEditorService.buildNodeStyle(model)
+          }
+
+          graph.addItem(command.type, model)
         } else if (command.action == "delete") {
           graph.removeItem(graph.findById(command.id))
         } else if (command.action == "update") {
-          graph.updateItem(graph.findById(command.id), command.model)
+          //command.model只包含更新过的部分字段
+          let model = Object.assign({}, command.model)
+          if (command.type == "node") {
+            //如果仅仅改动了位置,是不需要重新计算样式的
+            let mergeModel = Object.assign({}, this.producer.itemMap[command.id], command.model)
+            model.style = this.services.graphEditorService.buildNodeStyle(mergeModel)
+          }
+          graph.updateItem(graph.findById(command.id), model)
         } else {
           console.error("未知command类型", command)
         }

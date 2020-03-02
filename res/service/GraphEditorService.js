@@ -1,12 +1,29 @@
-function GraphEditorService(dataLayer) {
+function GraphEditorService({ dataLayer, eventSquare }) {
   this.dataLayer = dataLayer
+  this.eventSquare = eventSquare
 }
 
 GraphEditorService.prototype.updateItem = function (command) {
   return this.dataLayer.batch([command])
 }
 
-GraphEditorService.prototype.init = function ({ dom, data, eventSquare }) {
+GraphEditorService.prototype.buildNodeStyle = function (node) {
+  var labelFill = {
+    word: '#fdf72f',//黄色
+    entity: '#9ba0ff',//蓝色
+    class: '#ce621d',//橙色
+  }
+
+  var style = {};
+
+  if (node.type) {
+    style.fill = labelFill[node.type]
+  }
+
+  return style
+}
+
+GraphEditorService.prototype.init = function ({ dom, data }) {
   const graph = new G6.Graph({
     container: dom,  // String | HTMLElement，必须，容器 id 或容器本身
     width: Math.floor(dom.clientWidth),              // Number，必须，图的宽度
@@ -70,13 +87,17 @@ GraphEditorService.prototype.init = function ({ dom, data, eventSquare }) {
       }
     },
     dataLayer: this.dataLayer, //绑定数据层实例
-    eventSquare,//绑定事件广场实例
+    eventSquare: this.eventSquare,//绑定事件广场实例
     animate: true            // Boolean，可选，切换布局时是否使用动画过度
   });
 
   // 不能让g6实例污染数据层的数据
   var g6Data = JSON.parse(JSON.stringify(data));
   // 对G6数据添加预处理
+  g6Data.nodes.forEach(node => {
+    node.style = this.buildNodeStyle(node)
+  })
+
   g6Data.edges.forEach((edge) => {
     edge.style = {
       endArrow: true,
