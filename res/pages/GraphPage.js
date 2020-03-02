@@ -3,7 +3,7 @@ let GraphPage = Vue.component('graph-page', {
 
       <div style="position:fixed;z-index:999999">
         <router-link to="/">主页</router-link>
-        <button onclick="saveManager.exportData()">导出</button>
+        <button @click="saveManager.exportData()">导出</button>
         <span>未导出改动:{{saveManager.changeCount}}</span>
 
         <tab active="节点" class="tab left-bar">
