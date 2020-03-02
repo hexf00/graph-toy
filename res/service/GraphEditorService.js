@@ -56,6 +56,8 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       ]
     },
     defaultEdge: {
+      //3.2 无效
+      type: 'quadratic', // 指定边的形状为二阶贝塞尔曲线
       style: {
         endArrow: true,
         lineWidth: 2
