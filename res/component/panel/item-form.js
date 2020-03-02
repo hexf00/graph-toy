@@ -1,31 +1,31 @@
 let itemForm = {
   props: {
     item: Object,
+    extraData: Object,
     type: String,
   },
   watch: {
     item() {
       let data = JSON.parse(JSON.stringify(this.item))
-      delete data.soureItem
-      delete data.targetItem
-
       this.data = data
     }
   },
   // 初始化时执行,只会执行一次
   data() {
     let data = JSON.parse(JSON.stringify(this.item))
-    delete data.soureItem
-    delete data.targetItem
-
     //data是update 比对的数据
     return { data }
   },
   methods: {
-    focusLabel(){
+    focusLabel() {
       this.$refs.label.focus()
     },
-    submit(e) {
+    //用于外部判断,防止数据丢失
+    hasChange() {
+      let { changeCount } = this.calcUpdateModel()
+      return changeCount
+    },
+    calcUpdateModel() {
       var updateModel = {}
       var changeCount = 0
       for (const key in this.data) {
@@ -35,7 +35,10 @@ let itemForm = {
           changeCount++
         }
       }
-
+      return { updateModel, changeCount }
+    },
+    submit(e) {
+      let { updateModel, changeCount } = this.calcUpdateModel()
       if (changeCount > 0) {
         this.$emit("updateItem", {
           type: this.type,

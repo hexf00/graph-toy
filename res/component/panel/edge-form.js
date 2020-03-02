@@ -2,8 +2,8 @@ Vue.component('edge-form', {
   mixins: [itemForm],
   template: /*html*/`<div>
     <p>
-      {{item.soureItem.label}} =={{item.label}}==>
-      {{item.targetItem.label}}
+      {{extraData.soureItem.label}} =={{item.label}}==>
+      {{extraData.targetItem.label}}
     </p>
     <p>label：<input type="text" ref="label" v-model="data.label" name="label"  @keyup.enter="submit"></p>
     <div>

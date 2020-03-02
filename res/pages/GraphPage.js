@@ -4,7 +4,12 @@ let GraphPage = Vue.component('graph-page', {
       <div style="position:fixed;z-index:999999">
         <router-link to="/">主页</router-link>
         <button @click="saveManager.exportData()">导出</button>
+        <button @click="showConfig">配置</button>
         <span>未导出改动:{{saveManager.changeCount}}</span>
+
+        <modal ref="editorConfig" :show-footer="false">
+          <editor-config></editor-config>
+        </modal>
 
         <tab active="节点" class="tab left-bar">
           <panel title="节点" class="search-bar">
@@ -15,8 +20,8 @@ let GraphPage = Vue.component('graph-page', {
         <tab active="属性" class="tab attr-bar">
           <panel title="属性" class="search-bar">
             <div v-if="editItem">
-              <node-form v-if="editType == 'node'" ref="itemForm" type="node" :item="editItem" @updateItem="updateItem"></node-form>
-              <edge-form v-if="editType == 'edge'" ref="itemForm" type="edge" :item="editItem" @updateItem="updateItem"></edge-form>
+              <node-form v-if="editType == 'node'" ref="itemForm" type="node" :item="editItem" :extraData="editItemExtraData" @updateItem="updateItem"></node-form>
+              <edge-form v-if="editType == 'edge'" ref="itemForm" type="edge" :item="editItem" :extraData="editItemExtraData" @updateItem="updateItem"></edge-form>
             </div>
             <div v-else>未选择节点或属性</div>
           </panel>
@@ -33,6 +38,7 @@ let GraphPage = Vue.component('graph-page', {
       loading: true,
       editType: "",//node or edge
       editItem: null,
+      editItemExtraData: null,//额外数据,如边的数据
       dataLayer: {
         data: []
       },
@@ -43,21 +49,34 @@ let GraphPage = Vue.component('graph-page', {
     }
   },
   methods: {
+    showConfig() {
+      this.$refs.editorConfig.open("图编辑器配置")
+    },
     //node-list触发的方法
     focusNode(id) {
       this.focusItem("node", id)
+      //在事件广场中通知G6聚焦节点到中心
       this.eventSquare.emit("vueFocusNode", id)
     },
     //G6触发的方法,激活Vue属性面板
     focusItem(type, id) {
+      if (this.$refs.itemForm && this.$refs.itemForm.hasChange()) {
+        //产品设计上有2种逻辑,保存后继续操作/取消也继续/取消则取消当前操作
+        //因为两种操作逻辑不可共存,根据要执行操作的不同给出正确的提示即可.
+        if (confirm("属性数据发生更改,是否保存后继续?")) {
+          this.$refs.itemForm.submit()
+        }
+      }
+
       this.editType = type
 
-      if (type == "node") {
-        this.editItem = this.dataLayer.itemMap[id]
-      } else {
-        this.editItem = Object.assign({}, this.dataLayer.itemMap[id])
-        this.editItem.soureItem = this.dataLayer.itemMap[this.editItem.source]
-        this.editItem.targetItem = this.dataLayer.itemMap[this.editItem.target]
+      //保留引用用来判断
+      this.editItem = this.dataLayer.itemMap[id]
+      if (type == "edge") {
+        this.editItemExtraData = {
+          soureItem: this.dataLayer.itemMap[this.editItem.source],
+          targetItem: this.dataLayer.itemMap[this.editItem.target]
+        }
       }
 
       this.$nextTick(() => {
