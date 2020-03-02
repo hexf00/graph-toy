@@ -22,7 +22,7 @@ let itemForm = {
     return { data }
   },
   methods: {
-    save(e) {
+    submit(e) {
       var updateModel = {}
       var changeCount = 0
       for (const key in this.data) {

@@ -1,6 +1,6 @@
 Vue.component('edit-graph', {
   template: /*html*/`<div>
-      名称：<input type="text" v-model="data.name">
+      名称：<input v-focus type="text" v-model="data.name" @keyup.enter="submit">
       <button @click="submit">{{submitBtnShowText[mode]}}</button>
   </div>`,
   props: {

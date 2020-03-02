@@ -22,7 +22,7 @@ GraphService.prototype.getData = function () {
 GraphService.prototype.checkInput = function (data) {
   // 添加id唯一性判断
 
-  return Promise.resolve(() => {
+  return Promise.resolve().then(() => {
     if (!data.name || data.name.trim().length === 0) {
       return Promise.reject("请输入名称")
     } else {
