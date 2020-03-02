@@ -15,8 +15,8 @@ let GraphPage = Vue.component('graph-page', {
         <tab active="属性" class="tab attr-bar">
           <panel title="属性" class="search-bar">
             <div v-if="editItem">
-              <node-form v-if="editType == 'node'" type="node" :item="editItem" @updateItem="updateItem"></node-form>
-              <edge-form v-if="editType == 'edge'" type="edge" :item="editItem" @updateItem="updateItem"></edge-form>
+              <node-form v-if="editType == 'node'" ref="itemForm" type="node" :item="editItem" @updateItem="updateItem"></node-form>
+              <edge-form v-if="editType == 'edge'" ref="itemForm" type="edge" :item="editItem" @updateItem="updateItem"></edge-form>
             </div>
             <div v-else>未选择节点或属性</div>
           </panel>
@@ -60,6 +60,9 @@ let GraphPage = Vue.component('graph-page', {
         this.editItem.targetItem = this.dataLayer.itemMap[this.editItem.target]
       }
 
+      this.$nextTick(() => {
+        this.$refs.itemForm.focusLabel()
+      })
     },
     updateItem(command) {
       this.graphEditorService.updateItem(command).then(() => {

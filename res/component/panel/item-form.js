@@ -22,6 +22,9 @@ let itemForm = {
     return { data }
   },
   methods: {
+    focusLabel(){
+      this.$refs.label.focus()
+    },
     submit(e) {
       var updateModel = {}
       var changeCount = 0

@@ -5,7 +5,7 @@ Vue.component('edge-form', {
       {{item.soureItem.label}} =={{item.label}}==>
       {{item.targetItem.label}}
     </p>
-    <p>label：<input type="text" v-focus v-model="data.label" name="label"  @keyup.enter="submit"></p>
+    <p>label：<input type="text" ref="label" v-model="data.label" name="label"  @keyup.enter="submit"></p>
     <div>
       <div>描述:</div>
       <textarea style="width: 98%;min-height: 150px;" type="text"

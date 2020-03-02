@@ -1,7 +1,7 @@
 Vue.component('node-form', {
   mixins: [itemForm],
   template: /*html*/`<div>
-    <p>label：<input type="text" v-focus v-model="data.label" name="label" @keyup.enter="submit"></p>
+    <p>label：<input type="text" ref="label" v-model="data.label" name="label" @keyup.enter="submit"></p>
     <p>分类：<input type="text" v-model="data.category" name="category"></p>
     <p>类型：
       <select v-model="data._type">
