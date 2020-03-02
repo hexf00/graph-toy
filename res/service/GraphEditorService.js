@@ -85,8 +85,9 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       selected: {
         // hover 状态为 true 时的样式
         stroke: '#ff5959',
-        shadowColor: '#aaa',
-        shadowBlur: 30,
+        // g6bug 拖拽后阴影不消失
+        // shadowColor: '#aaa',
+        // shadowBlur: 30,
       },
     },
     // layout: {
@@ -106,8 +107,9 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       // click 状态为 true 时的样式
       selected: {
         stroke: '#ff5959',
-        shadowColor: '#aaa',
-        shadowBlur: 30,
+        // g6bug 拖拽后阴影不消失
+        // shadowColor: '#aaa',
+        // shadowBlur: 30,
       }
     },
     dataLayer: this.dataLayer, //绑定数据层实例
