@@ -4,6 +4,10 @@ function GraphEditorService({ dataLayer, eventSquare }) {
 }
 
 GraphEditorService.prototype.updateItem = function (command) {
+  //强制Vue添加监听，因为默认不存在_type属性
+  if (command.model._type) {
+    Vue.set(this.dataLayer.itemMap[command.id], '_type', command.model._type)
+  }
   return this.dataLayer.batch([command])
 }
 

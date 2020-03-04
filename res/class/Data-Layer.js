@@ -56,6 +56,7 @@ DataLayer.prototype.batch = function (commands) {
 
   return Promise.all(actions).then(() => {
     this.scheduler.emit("batch", commands)
+    return commands
   }).catch((e) => {
     console.error("数据层 batch 时出错", e)
     return Promise.reject(e)
@@ -76,8 +77,9 @@ DataLayer.prototype.updateItem = function (command) {
   return new Promise((resolve, reject) => {
     let item = this.itemMap[id]
 
-    for (const key in command.model) {
-      const val = command.model[key];
+    //说明 如果是新增属性，可能会因为没有添加引用导致Vue不更新
+    for (const key in model) {
+      const val = model[key];
       if (item[key] !== val) {
         item[key] = val
       }

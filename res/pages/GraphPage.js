@@ -11,9 +11,12 @@ let GraphPage = Vue.component('graph-page', {
           <editor-config></editor-config>
         </modal>
 
-        <tab active="节点" class="tab left-bar">
+        <tab v-model="rightTabActve" class="tab left-bar">
           <panel title="节点" class="search-bar">
             <node-list :data="dataLayer.data.nodes" @focusNode="focusNode"></node-list>
+          </panel>
+          <panel title="类" class="search-bar">
+            <node-list :data="classList" @focusNode="focusNode"></node-list>
           </panel>
         </tab>
 
@@ -33,14 +36,25 @@ let GraphPage = Vue.component('graph-page', {
       </div>
     
     </div>`,
+  computed: {
+    'classList'() {
+      console.log("classList更新",JSON.stringify( this.dataLayer.data.nodes))
+      //新加入的节点不会触发更新
+      return this.dataLayer.data.nodes.filter(node => node._type === 'class')
+    }
+  },
   data() {
     return {
+      rightTabActve: '节点',
       loading: true,
       editType: "",//node or edge
       editItem: null,
       editItemExtraData: null,//额外数据,如边的数据
       dataLayer: {
-        data: []
+        data: {
+          nodes: [],
+          edges: []
+        }
       },
       graphEditorService: null,
       saveManager: {
@@ -79,15 +93,16 @@ let GraphPage = Vue.component('graph-page', {
         }
       }
 
-      this.$nextTick(() => {
-        this.$refs.itemForm.focusLabel()
-      })
+      // 如果激活输入框则不方便delete操作
+      // this.$nextTick(() => {
+      //   this.$refs.itemForm.focusLabel()
+      // })
     },
     updateItem(command) {
       this.graphEditorService.updateItem(command).then(() => {
         notify.success("数据更新成功")
       }).catch((err) => {
-        notify.error("更新数据时出错")
+        notify.error("更新数据时出错",err)
       })
     },
     onGetDataDone(data) {
