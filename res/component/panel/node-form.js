@@ -26,7 +26,7 @@ Vue.component('node-form', {
 
     
     <div v-if="data._type == 'class'">
-      <div>添加公共特征</div>
+      <div>添加共有特征</div>
       <characteristic-config-form v-model="data.characteristic"></characteristic-config-form>
     </div>
 

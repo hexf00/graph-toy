@@ -14,7 +14,7 @@ let GraphPage = Vue.component('graph-page', {
           <editor-config></editor-config>
         </modal>
 
-        <tab v-model="rightTabActve" class="tab left-bar">
+        <tab v-model="leftTabActve" class="tab left-bar">
           <panel title="节点" class="search-bar">
             <node-list :data="dataLayer.data.nodes" @focusNode="focusNode"></node-list>
           </panel>
@@ -23,13 +23,16 @@ let GraphPage = Vue.component('graph-page', {
           </panel>
         </tab>
 
-        <tab active="属性" class="tab attr-bar">
+        <tab v-model="rightTabActve"  class="tab attr-bar">
           <panel title="属性" class="search-bar">
             <div v-if="editItem">
               <node-form v-if="editType == 'node'" ref="itemForm" type="node" :item="editItem" :extraData="editItemExtraData" @updateItem="updateItem"></node-form>
               <edge-form v-if="editType == 'edge'" ref="itemForm" type="edge" :item="editItem" :extraData="editItemExtraData" @updateItem="updateItem"></edge-form>
             </div>
             <div v-else>未选择节点或属性</div>
+          </panel>
+          <panel title="JSON">
+            <pre v-html="JSON.stringify(editItem,null,2)"></pre>
           </panel>
         </tab>
       </div>
@@ -48,7 +51,8 @@ let GraphPage = Vue.component('graph-page', {
   },
   data() {
     return {
-      rightTabActve: '节点',
+      leftTabActve: '节点',
+      rightTabActve: '属性',
       loading: true,
       editType: "",//node or edge
       editItem: null,
@@ -95,10 +99,10 @@ let GraphPage = Vue.component('graph-page', {
           targetItem: this.dataLayer.itemMap[this.editItem.target]
         }
       }
-      
+
       //动态特征 节点选择器用
       this.editItemExtraData.dataLayer = this.dataLayer
-      
+
       //属种关系
       this.editItemExtraData.classList = this.classList
 
@@ -111,7 +115,7 @@ let GraphPage = Vue.component('graph-page', {
       this.graphEditorService.updateItem(command).then(() => {
         notify.success("数据更新成功")
       }).catch((err) => {
-        notify.error("更新数据时出错",err)
+        notify.error("更新数据时出错", err)
       })
     },
     onGetDataDone(data) {
