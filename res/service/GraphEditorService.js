@@ -35,15 +35,12 @@ GraphEditorService.prototype.checkUpdateData = function ({ model }) {
 
 GraphEditorService.prototype.updateItem = function (command) {
   return this.checkUpdateData(command).then(() => {
-    //强制Vue添加监听，因为默认不存在_type属性
-    if (command.model._type) {
-      Vue.set(this.dataLayer.itemMap[command.id], '_type', command.model._type)
-    }
-    if (command.model.characteristic) {
-      Vue.set(this.dataLayer.itemMap[command.id], 'characteristic', command.model.characteristic)
-    }
-    if (command.model.category) {
-      Vue.set(this.dataLayer.itemMap[command.id], 'category', command.model.category)
+    //强制Vue为动态添加的属性添加监听
+
+    for (const key in command.model) {
+      if (command.model.hasOwnProperty(key)) {
+        Vue.set(this.dataLayer.itemMap[command.id], key, command.model[key])
+      }
     }
     //因为普通方式追加新属性，不会触发vue的响应式，注：已有属性的改变是会触发的
   }).then(() => this.dataLayer.batch([command]))
