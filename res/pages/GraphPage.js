@@ -172,7 +172,10 @@ let GraphPage = Vue.component('graph-page', {
   // 路由离开时间, 作销毁操作
   beforeRouteLeave(to, from, next) {
     if (this.saveManager.changeCount > 0) {
-      console.log("存在没有保存的数据,应该提示用户导出保存");
+      // 可以做成配置式的
+      // console.log("存在没有保存的数据,应该提示用户导出保存");
+      this.saveManager.exportData(); //强行保存
+      notify.success("已自动导出修改后的版本。")
       this.saveManager.destroy();
       this.eventSquare.destroy();
       this.dataLayer.destroy();
