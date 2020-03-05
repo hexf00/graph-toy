@@ -15,6 +15,17 @@
  * @param {nodes:[],edges:[]} data 
  */
 var DataLayer = function (data) {
+  this.data = { noeds: [], edges: [] }
+  this.itemMap = {}
+
+  this.changeData(data)
+
+  this.scheduler = new Scheduler()
+  //在外部监听，使用场景：1可以实现数据变动时数据自动保存到磁盘、2写操作日志等、3通知其它实例进行更新数据等
+  this.on = this.scheduler.on.bind(this.scheduler)
+}
+
+DataLayer.prototype.changeData = function (data) {
   this.data = data
   this.itemMap = {}
 
@@ -30,9 +41,9 @@ var DataLayer = function (data) {
   this.data.nodes.forEach(mapItemInit)
   this.data.edges.forEach(mapItemInit)
 
-  this.scheduler = new Scheduler()
-  //在外部监听，使用场景：1可以实现数据变动时数据自动保存到磁盘、2写操作日志等、3通知其它实例进行更新数据等
-  this.on = this.scheduler.on.bind(this.scheduler)
+  if (this.scheduler) {
+    this.scheduler.emit("changeData", data)
+  }
 }
 
 /**

@@ -4,6 +4,9 @@ let GraphPage = Vue.component('graph-page', {
       <div style="position:fixed;z-index:999999">
         <router-link to="/">主页</router-link>
         <button @click="saveManager.exportData()">导出</button>
+        <button @click="$refs.importData.click()">导入</button>
+        <input ref="importData" type="file" @change="saveManager.importData($event)" name="" id="fileSelect" style="width:0px;height:1px;">
+        
         <button @click="showConfig">配置</button>
         <span>未导出改动:{{saveManager.changeCount}}</span>
 
@@ -15,7 +18,7 @@ let GraphPage = Vue.component('graph-page', {
           <panel title="节点" class="search-bar">
             <node-list :data="dataLayer.data.nodes" @focusNode="focusNode"></node-list>
           </panel>
-          <panel title="类" class="search-bar">
+          <panel title="一般概念" class="search-bar">
             <node-list :data="classList" @focusNode="focusNode"></node-list>
           </panel>
         </tab>
@@ -38,7 +41,7 @@ let GraphPage = Vue.component('graph-page', {
     </div>`,
   computed: {
     'classList'() {
-      console.log("classList更新",JSON.stringify( this.dataLayer.data.nodes))
+      // console.log("classList更新",JSON.stringify( this.dataLayer.data.nodes))
       //新加入的节点不会触发更新
       return this.dataLayer.data.nodes.filter(node => node._type === 'class')
     }
@@ -49,7 +52,7 @@ let GraphPage = Vue.component('graph-page', {
       loading: true,
       editType: "",//node or edge
       editItem: null,
-      editItemExtraData: null,//额外数据,如边的数据
+      editItemExtraData: {},//额外数据,如边的数据
       dataLayer: {
         data: {
           nodes: [],
@@ -92,6 +95,7 @@ let GraphPage = Vue.component('graph-page', {
           targetItem: this.dataLayer.itemMap[this.editItem.target]
         }
       }
+      this.editItemExtraData.classList = this.classList
 
       // 如果激活输入框则不方便delete操作
       // this.$nextTick(() => {

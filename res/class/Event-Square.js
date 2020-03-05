@@ -55,6 +55,12 @@ var EventSquare = function (producer) {
     return commands
   }).on("batch", (commands) => {
     console.log(`操作更新了${commands.length}条数据，注意及时保存。`)
+  }).on("changeData", (data) => {
+    this.consumers.g6.forEach((consumer) => {
+      const graph = consumer
+      let g6Data = this.services.graphEditorService.buildG6Data(data)
+      graph.changeData(g6Data)
+    })
   })
 
   this.scheduler = new Scheduler()

@@ -121,6 +121,15 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
     animate: true            // Boolean，可选，切换布局时是否使用动画过度
   });
 
+  let g6Data = this.buildG6Data(data);
+
+  graph.data(g6Data);
+  graph.render();
+  return graph;
+}
+
+
+GraphEditorService.prototype.buildG6Data = function (data) {
   // 不能让g6实例污染数据层的数据
   var g6Data = JSON.parse(JSON.stringify(data));
   // 对G6数据添加预处理
@@ -134,8 +143,5 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       lineWidth: 2
     }
   })
-
-  graph.data(g6Data);
-  graph.render();
-  return graph;
+  return g6Data
 }

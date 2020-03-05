@@ -62,7 +62,6 @@ SaveManager.prototype.exportData = function () {
     // if (data.nodes.length > 0) {
     //     filename = data.nodes[0].label + ".export.json";
     // }
-
     this.download(filename, JSON.stringify(this.dataLayer.data, null, 2))
     console.log("导出记录", filename, new Date());
 
@@ -74,6 +73,24 @@ SaveManager.prototype.exportData = function () {
         this.timer = null
     }
 }
+
+SaveManager.prototype.importData = function (e) {
+    var file = e.target.files[0];
+
+    if (!/application\/json/.test(file.type)) {
+        alert("文件格式错误！");
+        return false;
+    }
+    var that = this
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function (e) {
+        //更新数据
+        that.dataLayer.changeData(JSON.parse(this.result))
+        that.saveToLocalStorage()
+    }
+}
+
 
 SaveManager.prototype.destroy = function () {
     //销毁定时器
