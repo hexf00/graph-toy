@@ -3,10 +3,6 @@ Vue.component('node-form', {
   template: /*html*/`<div>
     <p>label：<input type="text" ref="label" v-model="data.label" name="label" @keyup.enter="submit"></p>
     <p>属种关系：
-      <!--<input type="text" v-model="data.category" name="category">-->
-      <!--<select v-model="data.category">
-        <option v-for="node in extraData.classList" :value="node.id">{{node.label}}</option>
-      </select>-->
       <node-selector v-model="data.category" :nodeList="extraData.classList"></node-selector>
     </p>
     <p>节点类型：
@@ -48,7 +44,9 @@ Vue.component('node-form', {
   computed: {
     characteristicConfig() {
       if (this.data.category) {
-        return this.extraData.dataLayer.itemMap[this.data.category].characteristic
+        return [].concat(...this.data.category.map(it => {
+          return this.extraData.dataLayer.itemMap[it].characteristic
+        }))
       }
     }
   }

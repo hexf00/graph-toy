@@ -7,12 +7,8 @@ Vue.component('characteristic-form', {
             {{item.name}}
           </td>
           <td>
-            
             <input v-if="item.control.type == 'text'" v-model="data[item.name]" type="text" @input="submit">
-            <select v-if="item.control.type == 'node'" v-model="data[item.name]" @input="submit">
-              <option v-for="node in nodeList[i]" :value="node.id">{{node.label}}</option>
-            </select>
-            
+            <node-selector v-if="item.control.type == 'node'" v-model="data[item.name]" @input="submit" :nodeList="nodeList[i]"></node-selector>
           </td>
         </tr>
       </table>
