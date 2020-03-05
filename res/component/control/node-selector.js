@@ -1,14 +1,19 @@
 Vue.component('node-selector', {
-  template: /*html*/`<div>
-    <div>
-      <span v-for="node in selectedList">{{node.label}}</span>
+  template: /*html*/`<div class="seletor">
+    <div @click.stop="show" class="tag-list">
+      <span class="tag" v-for="node in selectedList">{{node.label}}</span>
+      
+      <span>➕</span>
     </div>
-    <input type="text" @click.stop="inputClick">
-    <div ref="list" @click.stop>
-      <div v-for="node in nodeList" :value="node.id" @click="click(node)">
-      <span v-if="data.indexOf(node.id) !== -1">✅</span><span>{{node.label}}</span>
-      </div>
-    </div>
+    <ul v-show="showList" class="seletor-list" @click.stop>
+      <li><input ref="search" type="text" v-model="keyword"></li>
+      <li v-for="node in realList" :value="node.id" @click="click(node)">
+      <span v-if="data.indexOf(node.id) !== -1">✅</span>
+      <span v-else style="width:16px;display:inline-block;"></span>
+      <span>{{node.label}}</span>
+      </li>
+      <li v-show="realList.length == 0">没有数据</li>
+    </ul>
   </div>`,
   props: {
     nodeList: Array,
@@ -20,6 +25,13 @@ Vue.component('node-selector', {
     }
   },
   computed: {
+    realList() {
+      if (this.keyword) {
+        return this.nodeList.filter(it => it.label.indexOf(this.keyword) !== -1)
+      } else {
+        return this.nodeList
+      }
+    },
     selectedList() {
       return this.nodeList.filter(it => this.data.indexOf(it.id) !== -1)
     }
@@ -31,20 +43,20 @@ Vue.component('node-selector', {
   },
   data() {
     return {
+      keyword: "",
       data: this.value,
+      showList: false,
     }
   },
   mounted() {
     window.addEventListener("click", () => {
-      this.hiddenList()
+      this.showList = false
     })
   },
   methods: {
-    hiddenList() {
-      this.$refs.list.hidden = true
-    },
-    inputClick() {
-      this.$refs.list.hidden = false
+    show() {
+      this.showList = true
+      this.$nextTick(() => this.$refs.search.focus())
     },
     click(node) {
       let index = this.data.indexOf(node.id)

@@ -69,3 +69,33 @@ div.node-list li{
 div.node-list li:hover{
     opacity:0.6;
 }
+
+div.seletor{
+    display:inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+div.seletor ul.seletor-list{
+    background-color: #fff;
+    outline: auto;
+    position: absolute;
+    left: 0;
+    width: 160px;
+    margin: 0;
+}
+
+div.seletor ul.seletor-list > li{
+    background-color: #fff;
+    padding: 5px;
+}
+div.seletor .tag-list{
+    margin: 1px 0;
+}
+div.seletor .tag{
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #9C27B0;
+    color: #ddd;
+    padding: 0 1px;
+}
