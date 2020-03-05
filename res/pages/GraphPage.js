@@ -81,6 +81,10 @@ let GraphPage = Vue.component('graph-page', {
     },
     //G6触发的方法,激活Vue属性面板
     focusItem(type, id) {
+      if(!id){
+        //可能存在动态连线
+        return
+      }
       if (this.$refs.itemForm && this.$refs.itemForm.hasChange()) {
         //产品设计上有2种逻辑,保存后继续操作/取消也继续/取消则取消当前操作
         //因为两种操作逻辑不可共存,根据要执行操作的不同给出正确的提示即可.

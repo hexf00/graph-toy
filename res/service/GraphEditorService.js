@@ -12,7 +12,7 @@ GraphEditorService.prototype.checkUpdateData = function ({ model }) {
 
       let empty = model.characteristic.find(it => it.name.trim() === "")
 
-      if(empty){
+      if (empty) {
         return reject(`请输入特征名称`)
       }
 
@@ -24,7 +24,7 @@ GraphEditorService.prototype.checkUpdateData = function ({ model }) {
           nameDict[it.name] = it.name
         }
       })
-      if(repeat){
+      if (repeat) {
         return reject(`特征名称${repeat.name}发生重复`)
       }
 
@@ -41,6 +41,9 @@ GraphEditorService.prototype.updateItem = function (command) {
     }
     if (command.model.characteristic) {
       Vue.set(this.dataLayer.itemMap[command.id], 'characteristic', command.model.characteristic)
+    }
+    if (command.model.category) {
+      Vue.set(this.dataLayer.itemMap[command.id], 'category', command.model.category)
     }
     //因为普通方式追加新属性，不会触发vue的响应式，注：已有属性的改变是会触发的
   }).then(() => this.dataLayer.batch([command]))
@@ -169,6 +172,24 @@ GraphEditorService.prototype.buildG6Data = function (data) {
   var g6Data = JSON.parse(JSON.stringify(data));
   // 对G6数据添加预处理
   g6Data.nodes.forEach(node => {
+    // 开启后显示属种关系，动态连线
+    // if (node.category) {
+    //   g6Data.edges.push({
+    //     source: node.category,
+    //     target: node.id,
+    //     label: '属种关系'
+    //   })
+    // }
+
+    // if (node.平台) {
+    //   g6Data.edges.push({
+    //     source: node.id,
+    //     target: node.平台,
+    //     label: '平台'
+    //   })
+    // }
+
+
     node.style = this.buildNodeStyle(node)
   })
 

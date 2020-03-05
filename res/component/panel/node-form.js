@@ -46,7 +46,9 @@ Vue.component('node-form', {
   </div>`,
   computed:{
     characteristicConfig(){
-      return this.extraData.dataLayer.itemMap[this.data.category].characteristic
+      if(this.data.category){
+        return this.extraData.dataLayer.itemMap[this.data.category].characteristic
+      }
     }
   }
 })
