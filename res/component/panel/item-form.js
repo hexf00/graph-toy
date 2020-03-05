@@ -30,9 +30,17 @@ let itemForm = {
       var changeCount = 0
       for (const key in this.data) {
         // 排除拖拽改变了节点的位置
-        if (key != 'x' && key != 'y' && this.data[key] !== this.item[key]) {
-          updateModel[key] = this.data[key]
-          changeCount++
+        if (key != 'x' && key != 'y') {
+          if (key === 'characteristic') {
+            // console.log(JSON.stringify(this.data[key]), JSON.stringify(this.item[key]))
+            if (JSON.stringify(this.data[key]) !== JSON.stringify(this.item[key])) {
+              updateModel[key] = this.data[key]
+              changeCount++
+            }
+          } else if (this.data[key] !== this.item[key]) {
+            updateModel[key] = this.data[key]
+            changeCount++
+          }
         }
       }
       return { updateModel, changeCount }

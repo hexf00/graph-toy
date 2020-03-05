@@ -2,13 +2,48 @@ function GraphEditorService({ dataLayer, eventSquare }) {
   this.dataLayer = dataLayer
   this.eventSquare = eventSquare
 }
+GraphEditorService.prototype.checkUpdateData = function ({ model }) {
+  return new Promise((resolve, reject) => {
+
+    if (model.hasOwnProperty('label') && model.label.trim() === "") {
+      return reject("请输入节点名称")
+    }
+    if (model.hasOwnProperty('characteristic')) {
+
+      let empty = model.characteristic.find(it => it.name.trim() === "")
+
+      if(empty){
+        return reject(`请输入特征名称`)
+      }
+
+      let nameDict = {}
+      let repeat = model.characteristic.find(it => {
+        if (nameDict.hasOwnProperty(it.name)) {
+          return true
+        } else {
+          nameDict[it.name] = it.name
+        }
+      })
+      if(repeat){
+        return reject(`特征名称${repeat.name}发生重复`)
+      }
+
+    }
+    resolve()
+  })
+}
 
 GraphEditorService.prototype.updateItem = function (command) {
-  //强制Vue添加监听，因为默认不存在_type属性
-  if (command.model._type) {
-    Vue.set(this.dataLayer.itemMap[command.id], '_type', command.model._type)
-  }
-  return this.dataLayer.batch([command])
+  return this.checkUpdateData(command).then(() => {
+    //强制Vue添加监听，因为默认不存在_type属性
+    if (command.model._type) {
+      Vue.set(this.dataLayer.itemMap[command.id], '_type', command.model._type)
+    }
+    if (command.model.characteristic) {
+      Vue.set(this.dataLayer.itemMap[command.id], 'characteristic', command.model.characteristic)
+    }
+    //因为普通方式追加新属性，不会触发vue的响应式，注：已有属性的改变是会触发的
+  }).then(() => this.dataLayer.batch([command]))
 }
 
 GraphEditorService.prototype.buildNodeStyle = function (node) {
