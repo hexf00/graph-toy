@@ -29,6 +29,11 @@ Vue.component('node-form', {
       <div>添加公共特征</div>
       <characteristic-config-form v-model="data.characteristic"></characteristic-config-form>
     </div>
+
+    <div v-if="data._type == 'entity' && characteristicConfig">
+      <div>特征</div>
+      <characteristic-form v-model="data" :config="characteristicConfig" :dataLayer="extraData.dataLayer"></characteristic-form>
+    </div>
     
     <!--<div>
     <div>动态脚本:</div>
@@ -38,5 +43,10 @@ Vue.component('node-form', {
     -->
     <button type="button" @click="submit">保存</button>
 
-  </div>`
+  </div>`,
+  computed:{
+    characteristicConfig(){
+      return this.extraData.dataLayer.itemMap[this.data.category].characteristic
+    }
+  }
 })

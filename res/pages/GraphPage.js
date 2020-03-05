@@ -95,6 +95,11 @@ let GraphPage = Vue.component('graph-page', {
           targetItem: this.dataLayer.itemMap[this.editItem.target]
         }
       }
+      
+      //动态特征 节点选择器用
+      this.editItemExtraData.dataLayer = this.dataLayer
+      
+      //属种关系
       this.editItemExtraData.classList = this.classList
 
       // 如果激活输入框则不方便delete操作
