@@ -5,6 +5,10 @@ Vue.component('layout-list', {
       <div>布局脚本：<textarea v-model="editItem.filterScript" style="width:100%;height:150px" type="text"></textarea></div>
     </modal>
     <ul>
+      <li v-for="layout,i in defaultList">
+        {{layout.name}}
+        <a @click="relayout(layout)" href="javascript:;">应用</a>
+      </li>
       <li v-for="layout,i in list">
           {{layout.name}}
           <a @click="relayout(layout)" href="javascript:;">应用</a>
@@ -29,6 +33,23 @@ Vue.component('layout-list', {
   },
   data() {
     return {
+      defaultList: [
+        {
+          name: "默认布局",
+          filterScript: ""
+        },
+        {
+          name: "fruchterman布局",
+          filterScript: `
+          graph.updateLayout({
+            type: 'fruchterman',
+            gravity: 1,              // 可选
+            speed: 5,                 // 可选
+            maxIteration: 2000
+           })
+          `
+        }
+      ],
       list: this.value,
       editItemRaw: null,
       editItem: null,
