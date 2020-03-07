@@ -125,6 +125,46 @@ var EventSquare = function (producer) {
     })
   })
 
+  //重新布局
+  this.scheduler.on("relayout", (layoutConfig) => {
+    layer.msg('加载中', {
+      icon: 16,
+      shade: 0.01,
+      time: 100
+    });
+    //UI卡死,延迟执行
+    setTimeout(() => {
+
+      this.consumers.g6.forEach((consumer) => {
+        const graph = consumer
+
+        console.log('layoutController', graph.get('layoutController'))
+        console.time("rerender")
+        graph.clear()
+
+        if (layoutConfig.filterScript) {
+          let filterFunc = new Function('graph', 'dataLayout', 'layoutConfig', layoutConfig.filterScript)
+          filterFunc(graph, this.producer, layoutConfig)
+        } else {
+          // 恢复默认，删除布局
+          let layoutController = graph.get('layoutController');
+          layoutController.layoutCfg = {};
+          layoutController.layoutType = layoutController.layoutCfg.type;
+          layoutController.worker = null;
+          layoutController.workerData = {};
+        }
+
+        let g6Data = this.services.graphEditorService.buildG6Data(this.producer.data, layoutConfig)
+        graph.data(g6Data)
+        graph.render();
+
+        console.timeEnd("rerender")
+      })
+
+    }, 100)
+
+  })
+
   //在外部监听，使用场景：1. g6通知vue实例激活指定节点的编辑面板
   this.on = this.scheduler.on.bind(this.scheduler)
   this.emit = this.scheduler.emit.bind(this.scheduler)
@@ -150,5 +190,7 @@ EventSquare.prototype.addVue = function (vm) {
 
 // 销毁
 EventSquare.prototype.destroy = function (vm) {
+  //g6画布需要销毁，否则DOM被占用无法
+  this.consumers.g6.forEach(graph => graph.destroy())
   this.scheduler.destroy()
 }

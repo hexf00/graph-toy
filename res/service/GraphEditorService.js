@@ -130,11 +130,11 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
       },
     },
     layout: {
-   
-      type: 'fruchterman',
-      gravity: 1,              // 可选
-      speed: 5,                 // 可选
-      maxIteration: 2000
+      //不能给type赋默认值，否则会导致位置信息丢失
+      // type: 'fruchterman',
+      // gravity: 1,              // 可选
+      // speed: 5,                 // 可选
+      // maxIteration: 2000
     },
 
     // 边在各状态下的样式
@@ -155,25 +155,32 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
     animate: true            // Boolean，可选，切换布局时是否使用动画过度
   });
 
+  console.time("render")
+  console.log('layoutController',graph.get('layoutController'))
   let g6Data = this.buildG6Data(data);
 
   graph.data(g6Data);
   graph.render();
+  console.timeEnd("render")
   return graph;
 }
 
 
-GraphEditorService.prototype.buildG6Data = function (data) {
+GraphEditorService.prototype.buildG6Data = function (data, layoutConfig) {
+
   // 不能让g6实例污染数据层的数据
   var g6Data = JSON.parse(JSON.stringify(data));
 
   let dynamicEdges = {
-    // category: '属种关系',
+    category: {
+      label: '属种关系',
+      deny: ['数据图表'],
+    },
     // alias: 'alias',
     // family: 'family',
     // purpose: 'purpose',
     // coord: 'coord',
-    shape: 'shape',
+    // shape: 'shape',
     // channel: 'channel',
     // 图表分类: '图表分类'
   }
@@ -183,14 +190,26 @@ GraphEditorService.prototype.buildG6Data = function (data) {
   g6Data.nodes.forEach(node => {
     // 开启后显示属种关系，动态连线
     Object.keys(dynamicEdges).forEach(k => {
-      if (node[k]) {
+      if (node.hasOwnProperty(k) && node[k] instanceof Array) {
         node[k].forEach(v => {
           if (k == 'category') {
-            g6Data.edges.push({
+
+            let edge = {
               source: v,
-              target: node.id,
-              label: dynamicEdges[k]
-            })
+              target: node.id
+            }
+            let dynamicEdgeConfig = dynamicEdges[k]
+
+            if (dynamicEdgeConfig instanceof Object) {
+              if(dynamicEdgeConfig.deny.indexOf(v) === -1){
+                edge.label = dynamicEdgeConfig.label
+                g6Data.edges.push(edge)
+              }
+            } else {
+              edge.label = dynamicEdgeConfig
+              g6Data.edges.push(edge)
+            }
+
           } else {
             g6Data.edges.push({
               source: node.id,
