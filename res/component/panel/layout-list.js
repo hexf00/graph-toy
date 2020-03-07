@@ -3,12 +3,17 @@ Vue.component('layout-list', {
     <modal v-if="editItem" ref="scriptEditor" @done="update">
       <div>布局名称：<input v-model="editItem.name" type="text" /></div>
       <div>布局脚本：<textarea v-model="editItem.filterScript" style="width:100%;height:150px" type="text"></textarea></div>
+      <button @click="preview">预览布局</button>
     </modal>
     <ul>
+      <li style="text-align: center;font-weight: bold;">预置布局</li>
       <li v-for="layout,i in defaultList">
         {{layout.name}}
         <a @click="relayout(layout)" href="javascript:;">应用</a>
+        <a @click="clone(layout)" href="javascript:;">克隆</a>
       </li>
+
+      <li style="text-align: center;font-weight: bold;" v-if="list.length > 0">图表布局</li>
       <li v-for="layout,i in list">
           {{layout.name}}
           <a @click="relayout(layout)" href="javascript:;">应用</a>
@@ -48,6 +53,16 @@ Vue.component('layout-list', {
             maxIteration: 2000
            })
           `
+        },
+        {
+          name: "force布局",
+          filterScript: `
+          graph.updateLayout({
+            type: 'force',            // 设置布局算法为 force
+            linkDistance: 100,        // 设置边长为 100
+            preventOverlap: true,     // 设置防止重叠
+           })
+          `
         }
       ],
       list: this.value,
@@ -56,6 +71,9 @@ Vue.component('layout-list', {
     }
   },
   methods: {
+    preview() {
+      this.$emit('relayout', this.editItem)
+    },
     relayout(layout) {
       this.$emit('relayout', layout)
     },
@@ -72,6 +90,10 @@ Vue.component('layout-list', {
     },
     remove(index) {
       this.list.splice(index, 1)
+      this.submit()
+    },
+    clone(layout) {
+      this.list.push({ ...layout })
       this.submit()
     },
     add() {
