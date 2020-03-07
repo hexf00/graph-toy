@@ -20,7 +20,7 @@ var EventSquare = function (producer) {
 
   this.producer.on("batch", (commands) => {
     this.consumers.g6.forEach((consumer) => {
-      var graph = consumer;
+      var graph = consumer.graph;
 
       const autoPaint = graph.get('autoPaint');
       graph.setAutoPaint(false);
@@ -57,7 +57,7 @@ var EventSquare = function (producer) {
     console.log(`操作更新了${commands.length}条数据，注意及时保存。`)
   }).on("changeData", (data) => {
     this.consumers.g6.forEach((consumer) => {
-      const graph = consumer
+      const graph = consumer.graph
       let g6Data = this.services.graphEditorService.buildG6Data(data)
       graph.changeData(g6Data)
     })
@@ -76,7 +76,7 @@ var EventSquare = function (producer) {
   //Vue通知G6将节点放在画布中心
   this.scheduler.on("vueFocusNode", (id) => {
     this.consumers.g6.forEach((consumer) => {
-      var graph = consumer;
+      var graph = consumer.graph;
 
       //参考g6.antv.vision/zh/examples/interaction/position
       var item = graph.findById(id);
@@ -135,23 +135,32 @@ var EventSquare = function (producer) {
     //UI卡死,延迟执行
     setTimeout(() => {
 
-      this.consumers.g6.forEach((consumer) => {
-        const graph = consumer
-
-        console.log('layoutController', graph.get('layoutController'))
+      this.consumers.g6.forEach((consumer, i) => {
         console.time("rerender")
-        graph.clear()
+        // 默认方案
+        // var graphWrapper = consumer
+
+        // 性能优化方案，使用新的graphWrapper会让代码更快，减少运行时间500ms+
+        let dom = consumer.dom;
+        consumer.destroy();
+        var graphWrapper = new GraphWrapper({
+          dataLayer: this.producer,
+          eventSquare: this,
+          dom: dom
+        })
+        this.consumers.g6[i] = graphWrapper
+
+
+        // 重新初始化
+        var graph = graphWrapper.init();
+
+        // 性能优化方案，需要渲染一次，否则会导致filterFunc中部分方法无法正常工作
+        graph.data({ nodes: [], edges: [] });
+        graph.render();
 
         if (layoutConfig.filterScript) {
           let filterFunc = new Function('graph', 'dataLayout', 'layoutConfig', layoutConfig.filterScript)
           filterFunc(graph, this.producer, layoutConfig)
-        } else {
-          // 恢复默认，删除布局
-          let layoutController = graph.get('layoutController');
-          layoutController.layoutCfg = {};
-          layoutController.layoutType = layoutController.layoutCfg.type;
-          layoutController.worker = null;
-          layoutController.workerData = {};
         }
 
         let g6Data = this.services.graphEditorService.buildG6Data(this.producer.data, layoutConfig)
@@ -161,7 +170,7 @@ var EventSquare = function (producer) {
         console.timeEnd("rerender")
       })
 
-    }, 100)
+    }, 30)
 
   })
 
@@ -171,15 +180,15 @@ var EventSquare = function (producer) {
 }
 
 // 注册G6实例
-EventSquare.prototype.addGraph = function (graph) {
-  this.consumers.g6.push(graph)
+EventSquare.prototype.addGraph = function (graphWrapper) {
+  this.consumers.g6.push(graphWrapper)
 }
 
 // 注销G6实例
-EventSquare.prototype.removeGraph = function (graph) {
-  var graphIndex = this.consumers.g6.indexOf(graph)
-  if (graphIndex !== -1) {
-    this.consumers.g6.splice(graphIndex, 1)
+EventSquare.prototype.removeGraph = function (graphWrapper) {
+  var graphWrapperIndex = this.consumers.g6.indexOf(graphWrapper)
+  if (graphWrapperIndex !== -1) {
+    this.consumers.g6.splice(graphWrapperIndex, 1)
   }
 }
 
@@ -191,6 +200,6 @@ EventSquare.prototype.addVue = function (vm) {
 // 销毁
 EventSquare.prototype.destroy = function (vm) {
   //g6画布需要销毁，否则DOM被占用无法
-  this.consumers.g6.forEach(graph => graph.destroy())
+  this.consumers.g6.forEach(graphWrapper => graphWrapper.destroy())
   this.scheduler.destroy()
 }

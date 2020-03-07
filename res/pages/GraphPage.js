@@ -79,7 +79,6 @@ let GraphPage = Vue.component('graph-page', {
       this.saveManager.saveToLocalStorage();
     },
     relayout(config) {
-      // console.log(config)
       this.eventSquare.emit("relayout", config)
     },
     showConfig() {
@@ -152,12 +151,11 @@ let GraphPage = Vue.component('graph-page', {
 
       this.eventSquare.services.graphEditorService = this.graphEditorService
 
-      var graph = this.graphEditorService.init({
-        dom: this.$refs.graph,
-        data: data.data
+      var graphWrapper = this.graphEditorService.init({
+        dom: this.$refs.graph
       })
 
-      this.eventSquare.addGraph(graph);
+      this.eventSquare.addGraph(graphWrapper);
       this.eventSquare.addVue(this);
 
       this.saveManager = new SaveManager({

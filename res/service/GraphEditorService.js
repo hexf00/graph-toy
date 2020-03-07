@@ -77,95 +77,26 @@ GraphEditorService.prototype.buildNodeStyle = function (node) {
   return style
 }
 
-GraphEditorService.prototype.init = function ({ dom, data }) {
-  const graph = new G6.Graph({
-    container: dom,  // String | HTMLElement，必须，容器 id 或容器本身
-    width: Math.floor(dom.clientWidth),              // Number，必须，图的宽度
-    height: Math.floor(dom.clientHeight),             // Number，必须，图的高度
-    // renderer: "svg",
-    modes: {
-      default: [
-        'dblclick-new',
-        'shortcut-keys',
-        'brush-select',
-        'custom-drag-node',
-        'item-click',
-        'drag-canvas',
-        'zoom-canvas',
-        'item-hover',
-        // 边提示框交互工具的配置
-        {
-          type: 'edge-tooltip',
-          formatText(model) {
-            var target = this.graph.findById(model.target).getModel();
-            var source = this.graph.findById(model.source).getModel();
+GraphEditorService.prototype.init = function ({ dom }) {
+  var graphWrapper = new GraphWrapper({
+    dataLayer: this.dataLayer,
+    eventSquare: this.eventSquare,
+    dom: dom
+  })
 
-            const text = `${source.label} ==${model.label || ""}==> ${target.label}`;
-            return text;
-          },
-          shouldUpdate: e => {
-            return true;
-          }
-        }
-      ]
-    },
-    defaultEdge: {
-      type: 'quadratic', // 指定边的形状为二阶贝塞尔曲线 3.2无效
-      style: {
-        endArrow: true,
-        lineWidth: 2
-      }
-    },
-    nodeStateStyles: {
-      hover: {
-        stroke: '#ff5959',
-        lineWidth: 1, //default样式
-      },
-      selected: {
-        // hover 状态为 true 时的样式
-        stroke: '#ff5959',
-        // g6bug 拖拽后阴影不消失
-        // shadowColor: '#aaa',
-        // shadowBlur: 30,
-      },
-    },
-    layout: {
-      //不能给type赋默认值，否则会导致位置信息丢失
-      // type: 'fruchterman',
-      // gravity: 1,              // 可选
-      // speed: 5,                 // 可选
-      // maxIteration: 2000
-    },
-
-    // 边在各状态下的样式
-    edgeStateStyles: {
-      hover: {
-        stroke: '#ff5959'
-      },
-      // click 状态为 true 时的样式
-      selected: {
-        stroke: '#ff5959',
-        // g6bug 拖拽后阴影不消失
-        // shadowColor: '#aaa',
-        // shadowBlur: 30,
-      }
-    },
-    dataLayer: this.dataLayer, //绑定数据层实例
-    eventSquare: this.eventSquare,//绑定事件广场实例
-    animate: true            // Boolean，可选，切换布局时是否使用动画过度
-  });
-
+  // 灵异事件：启用setTimeout会导致速度大幅度下降 300ms->1000ms 1.5s->2s
+  // setTimeout(() => {
   console.time("render")
-  console.log('layoutController',graph.get('layoutController'))
-  let g6Data = this.buildG6Data(data);
-
+  var graph = graphWrapper.init()
+  var g6Data = this.buildG6Data(this.dataLayer.data);
   graph.data(g6Data);
   graph.render();
   console.timeEnd("render")
-  return graph;
+  // }, 0)
+  return graphWrapper;
 }
 
-
+//纯粹的数据处理函数
 GraphEditorService.prototype.buildG6Data = function (data, layoutConfig) {
 
   // 不能让g6实例污染数据层的数据
@@ -201,7 +132,7 @@ GraphEditorService.prototype.buildG6Data = function (data, layoutConfig) {
             let dynamicEdgeConfig = dynamicEdges[k]
 
             if (dynamicEdgeConfig instanceof Object) {
-              if(dynamicEdgeConfig.deny.indexOf(v) === -1){
+              if (dynamicEdgeConfig.deny.indexOf(v) === -1) {
                 edge.label = dynamicEdgeConfig.label
                 g6Data.edges.push(edge)
               }
