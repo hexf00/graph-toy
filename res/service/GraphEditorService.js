@@ -129,14 +129,13 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
         // shadowBlur: 30,
       },
     },
-    // layout: {
-    //     type: 'force',            // 设置布局算法为 force
-    //     linkDistance: 150,        // 设置边长为 100
-    //     preventOverlap: true,     // 设置防止重叠
-    //     nodeSize: 60,
-    //     nodeStrength: 10,
-    //     edgeStrength: 3,
-    // },  
+    layout: {
+   
+      type: 'fruchterman',
+      gravity: 1,              // 可选
+      speed: 5,                 // 可选
+      maxIteration: 2000
+    },
 
     // 边在各状态下的样式
     edgeStateStyles: {
@@ -167,16 +166,43 @@ GraphEditorService.prototype.init = function ({ dom, data }) {
 GraphEditorService.prototype.buildG6Data = function (data) {
   // 不能让g6实例污染数据层的数据
   var g6Data = JSON.parse(JSON.stringify(data));
+
+  let dynamicEdges = {
+    // category: '属种关系',
+    // alias: 'alias',
+    // family: 'family',
+    // purpose: 'purpose',
+    // coord: 'coord',
+    shape: 'shape',
+    // channel: 'channel',
+    // 图表分类: '图表分类'
+  }
+
+
   // 对G6数据添加预处理
   g6Data.nodes.forEach(node => {
     // 开启后显示属种关系，动态连线
-    // if (node.category) {
-    //   g6Data.edges.push({
-    //     source: node.category,
-    //     target: node.id,
-    //     label: '属种关系'
-    //   })
-    // }
+    Object.keys(dynamicEdges).forEach(k => {
+      if (node[k]) {
+        node[k].forEach(v => {
+          if (k == 'category') {
+            g6Data.edges.push({
+              source: v,
+              target: node.id,
+              label: dynamicEdges[k]
+            })
+          } else {
+            g6Data.edges.push({
+              source: node.id,
+              target: v,
+              label: dynamicEdges[k]
+            })
+          }
+        })
+      }
+    })
+
+
 
     // if (node.平台) {
     //   g6Data.edges.push({

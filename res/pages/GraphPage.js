@@ -81,7 +81,7 @@ let GraphPage = Vue.component('graph-page', {
     },
     //G6触发的方法,激活Vue属性面板
     focusItem(type, id) {
-      if(!id){
+      if (!id) {
         //可能存在动态连线
         return
       }
@@ -157,7 +157,6 @@ let GraphPage = Vue.component('graph-page', {
 
 
 
-
     },
     onGetDataFail(err) {
       this.loading = false
@@ -167,14 +166,29 @@ let GraphPage = Vue.component('graph-page', {
   },
   //第一次进入，无法通过this读取组件实例
   beforeRouteEnter(to, from, next) {
-    graphService.getByName(to.params.graphName).then((data) => {
-      next(vm => vm.onGetDataDone(data))
-    }).catch((err) => {
-      next(vm => vm.onGetDataFail(err))
-    })
+    layer.msg('加载中', {
+      icon: 16,
+      shade: 0.01,
+      time: 100
+    });
+
+    //内部操作会阻塞UI，使用settimeout延迟执行
+    setTimeout(() => {
+      graphService.getByName(to.params.graphName).then((data) => {
+        next(vm => vm.onGetDataDone(data))
+      }).catch((err) => {
+        next(vm => vm.onGetDataFail(err))
+      })
+    }, 30)
+
   },
   //重复进入要重置数据后再初始化数据,或者直接更新数据
   beforeRouteUpdate(to, from, next) {
+    layer.msg('加载中', {
+      icon: 16,
+      shade: 0.01,
+      time: 100
+    });
     this.loading = true
     this.list = []
     graphService.getByName(to.params.graphName).then((data) => {
