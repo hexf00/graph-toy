@@ -77,6 +77,9 @@ SaveManager.prototype.exportData = function () {
 SaveManager.prototype.importData = function (e) {
     var file = e.target.files[0];
 
+    // 重置，否则重复导入同一个文件会失效
+    e.target.value = ""
+
     if (!/application\/json/.test(file.type)) {
         alert("文件格式错误！");
         return false;
