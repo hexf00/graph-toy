@@ -42,6 +42,7 @@ let data = Object.keys(avackb).filter((chartId) => {
 
   //添加属种关系
   chart.category = [nodes[0].id]
+  chart._type = 'entity' //图中的语境是个体概念
 
   return chart
 })
@@ -61,7 +62,7 @@ data.forEach(chart => {
   Object.keys(chart).forEach((k) => {
     //排除保留键
     //dataPres 排除
-    if (['id', 'label', 'description', 'dataPres'].indexOf(k) === -1) {
+    if (['id', 'label', 'description', 'category', 'dataPres'].indexOf(k) === -1) {
 
 
 
@@ -106,4 +107,4 @@ data.forEach(chart => {
 nodes = nodes.concat(data, generalConcepts)
 
 
-fs.writeFileSync(__dirname + '/../data/output/ava.json', JSON.stringify({nodes,edges:[]}, null, 2))
+fs.writeFileSync(__dirname + '/../data/output/ava.json', JSON.stringify({ nodes, edges: [] }, null, 2))
