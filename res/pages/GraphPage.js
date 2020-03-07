@@ -21,6 +21,9 @@ let GraphPage = Vue.component('graph-page', {
           <panel title="一般概念" class="search-bar">
             <node-list :data="classList" @focusNode="focusNode"></node-list>
           </panel>
+          <panel title="布局" class="search-bar">
+            <layout-list v-model="dataLayer.data.layouts" @input="layoutsUpdate" @relayout="relayout"></layout-list>
+          </panel>
         </tab>
 
         <tab v-model="rightTabActve"  class="tab attr-bar">
@@ -60,7 +63,8 @@ let GraphPage = Vue.component('graph-page', {
       dataLayer: {
         data: {
           nodes: [],
-          edges: []
+          edges: [],
+          layouts: []
         }
       },
       graphEditorService: null,
@@ -70,6 +74,13 @@ let GraphPage = Vue.component('graph-page', {
     }
   },
   methods: {
+    layoutsUpdate(){
+      //手工保存
+      this.saveManager.saveToLocalStorage();
+    },
+    relayout(config) {
+      console.log(config)
+    },
     showConfig() {
       this.$refs.editorConfig.open("图编辑器配置")
     },

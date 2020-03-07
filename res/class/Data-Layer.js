@@ -15,7 +15,7 @@
  * @param {nodes:[],edges:[]} data 
  */
 var DataLayer = function (data) {
-  this.data = { noeds: [], edges: [] }
+  this.data = { noeds: [], edges: [], layouts: [] }
   this.itemMap = {}
 
   this.changeData(data)
@@ -27,6 +27,11 @@ var DataLayer = function (data) {
 
 DataLayer.prototype.changeData = function (data) {
   this.data = data
+
+  if(!this.data.hasOwnProperty('layouts')){
+    this.data.layouts = []
+  }
+  
   this.itemMap = {}
 
 
