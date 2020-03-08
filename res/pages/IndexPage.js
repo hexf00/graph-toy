@@ -1,8 +1,6 @@
 let IndexPage = Vue.component('index-page', {
   template: /*html*/`<div>
-    <div v-if="loading">loading</div>
-    
-    <a href="javascript:;" @click="showAdd">创建</a>
+    <div v-if="loading">loading</div>    
 
     <modal ref="remove_modal" @done="remove(removeItem)">
       <div v-if="removeItem">
@@ -13,20 +11,22 @@ let IndexPage = Vue.component('index-page', {
     <modal ref="modal" :show-footer="false">
       <edit-graph :mode="editMode" :info="editItem" @savedone="savedone" @savefail="showError"></edit-graph>
     </modal>
+    <div>
+      <div class="header">
+        <h1>graph-toy</h1>
+        <h2>
+          关系图数据编辑器
+          <a style="font-size:0.75em" class="button-secondary pure-button" href="https://github.com/hexf00/graph-toy">View on GitHub</a>
+        </h2>
+      </div>
+      <div class="content">
+        <div style="margin:1em 0;">
+          <a class="pure-button pure-button-primary" href="javascript:;" @click="showAdd">新建数据集</a>
+        </div>
+        <dataset-list-table :list="list" @action="onAction"></dataset-list-table>
 
-    <div v-if="list.length == 0">
-      还没有图，先来添加一个吧。
-      <a href="javascript:;" @click="showAdd">创建</a>
+      </div>
     </div>
-    <ul v-else>
-      <li v-for="item in list">
-        {{item.name}} 
-        <router-link :to="'/graph/'+item.name">编辑数据</router-link>
-        <a href="javascript:;" @click="showEdit(item)">编辑名称</a>
-        <a href="javascript:;" @click="removeConfirm(item)">删除</a>
-
-      </li>
-    </ul>
   </div>`,
   data() {
     return {
@@ -38,6 +38,9 @@ let IndexPage = Vue.component('index-page', {
     }
   },
   methods: {
+    onAction(funcName) {
+      this[funcName].apply(this, Array.from(arguments).splice(1))
+    },
     refresh() {
       this.$refs.modal.close()
 

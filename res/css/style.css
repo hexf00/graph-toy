@@ -116,3 +116,79 @@ span.strong {
     padding: 10px 8px;
     box-shadow: rgb(174, 174, 174) 0px 0px 10px;
 }
+
+/* pure.css ext */
+.button-xsmall {
+    font-size: 70%;
+}
+
+.button-small {
+    font-size: 85%;
+}
+
+.button-large {
+    font-size: 110%;
+}
+
+.button-xlarge {
+    font-size: 125%;
+}
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.button-success {
+    background: rgb(28, 184, 65); /* this is a green */
+}
+
+.button-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
+
+.button-warning {
+    background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.button-secondary {
+    background: rgb(66, 184, 221); /* this is a light blue */
+}
+
+/* index Page */
+
+.header {
+    font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 1em;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    letter-spacing: 0.05em;
+}
+.header h1{
+    font-size: 300%;
+    font-weight: 100;
+    margin: 0;
+}
+.header h2{
+    font-size: 125%;
+    font-weight: 100;
+    line-height: 1.5;
+    margin: 0;
+    color: #666;
+    letter-spacing: -0.02em;
+}
+
+.content {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1em;
+    padding-right: 1em;
+    max-width: 768px;
+}
