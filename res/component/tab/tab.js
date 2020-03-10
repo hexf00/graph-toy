@@ -1,6 +1,6 @@
 Vue.component('tab', {
     template: /*html*/`
-    <div>
+    <div class="tab">
         <ul class="tab-title">
             <li v-for="title in panelTitles" @click="active_c=title" :class="{active:active_c == title}">{{title}}</li>
         </ul>

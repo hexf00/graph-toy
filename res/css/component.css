@@ -3,15 +3,71 @@ ul.tab-title {
     padding: 0;
 }
 
-ul.tab-title li {
+ul.tab-title > li {
     display: inline-block;
     cursor: pointer;
     padding: 5px;
 }
 
-ul.tab-title li.active {
+ul.tab-title > li.active {
     font-weight: bold;
 }
+/* tab ext */
+
+div.tab{
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);
+    border-color: #e6e6e6;
+    margin: 10px 2px;
+}
+
+ul.tab-title {
+    position: relative;
+    left: 0;
+    height: 30px;
+    white-space: nowrap;
+    font-size: 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    transition: all .2s;
+    -webkit-transition: all .2s;
+    background-color: #f2f2f2;
+}
+
+
+
+ul.tab-title > li {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: middle;
+    font-size: 12px;
+    transition: all .2s;
+    -webkit-transition: all .2s;
+    position: relative;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+ul.tab-title > li.active:after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: '';
+    width: 100%;
+    height: 31px;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid #5FB878;
+    background-color: inherit;
+}
+
+/* modal */
 
 div.modal-bg{
     z-index:9999999;

@@ -103,10 +103,10 @@ GraphEditorService.prototype.buildG6Data = function (data, layoutConfig) {
   var g6Data = JSON.parse(JSON.stringify(data));
 
   let dynamicEdges = {
-    category: {
-      label: '属种关系',
-      deny: ['数据图表'],
-    },
+    // category: {
+    //   label: '属种关系',
+    //   deny: ['数据图表'],
+    // },
     // alias: 'alias',
     // family: 'family',
     // purpose: 'purpose',
