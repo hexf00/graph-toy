@@ -50,6 +50,9 @@ Vue.component('characteristic-config-form', {
     showScriptEditor(item) {
       this.editItemRaw = item
       this.editItem = JSON.parse(JSON.stringify(item))
+      if(!this.editItem.filterScript){
+        this.editItem.filterScript = `// console.log(dataLayer, config, text2id)\nreturn dataLayer.data.nodes`
+      }
       this.$nextTick(() => this.$refs.scriptEditor.open("编辑过滤脚本配置"))
     },
     remove(index) {
