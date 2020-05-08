@@ -46,7 +46,7 @@ Vue.component('node-form', {
       if (this.data.category) {
         return [].concat(...this.data.category.map(it => {
           return this.extraData.dataLayer.itemMap[it].characteristic
-        }))
+        })).filter(it=>it)
       }
     }
   }
